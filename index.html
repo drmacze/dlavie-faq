@@ -3898,7 +3898,7 @@ function selectCategory(el) {
 }
 
 // ─── Generate auto-reply text ───
-function generateAutoReply(userName, issueTitle, issueId) {
+function generateAutoReply(userName, issueTitle, issueId, issueBody, category) {
   const date = new Date().toLocaleDateString('id-ID', {
     year: 'numeric', month: 'long', day: 'numeric',
     hour: '2-digit', minute: '2-digit'
@@ -3933,6 +3933,31 @@ async function submitIssue() {
   }
   if (title.length < 5) {
     errEl.textContent = 'Judul minimal 5 karakter.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (body.length < 10) {
+    errEl.textContent = 'Detail issue minimal 10 karakter. Jelaskan lebih lengkap.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  // Anti-spam: check if user created an issue in the last 3 minutes
+  const lastIssueTime = localStorage.getItem('dlavie_last_issue_time');
+  if (lastIssueTime) {
+    const elapsed = Date.now() - parseInt(lastIssueTime);
+    if (elapsed < 180000) {  // 3 minutes
+      const waitSec = Math.ceil((180000 - elapsed) / 1000);
+      errEl.textContent = `Tunggu ${waitSec} detik lagi sebelum membuat issue baru.`;
+      errEl.classList.add('show');
+      return;
+    }
+  }
+
+  // Anti-spam: reject obvious spam patterns
+  const spamPatterns = /^(test|asdf|aaaa|bbbb|1234|test123|halo|hi|hello|test issue|coba)$/i;
+  if (spamPatterns.test(title.trim())) {
+    errEl.textContent = 'Judul tidak valid. Gunakan judul yang deskriptif.';
     errEl.classList.add('show');
     return;
   }
@@ -3995,7 +4020,9 @@ async function submitIssue() {
     const autoReply = generateAutoReply(
       currentUser.display_name || currentUser.username,
       title,
-      shortId
+      shortId,
+      body,
+      selectedCategory
     );
 
     try {
@@ -4017,6 +4044,7 @@ async function submitIssue() {
       console.warn('Auto-reply insert failed:', e);
     }
 
+    localStorage.setItem('dlavie_last_issue_time', Date.now().toString());
     closeCreateIssueModal();
 
     // Scroll to issues page + refresh list

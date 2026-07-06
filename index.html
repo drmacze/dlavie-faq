@@ -3244,22 +3244,215 @@ function switchAuthMode(mode) {
   }
 }
 
-// ─── Connect to DLavie (deep link) ───
+// ─── Connect to DLavie (graceful deep link detection) ───
+// We use a 3-tier approach that does NOT trigger browser error dialogs:
+//   1. Try to open the app via hidden iframe (silent fail if app not installed)
+//   2. Set a timeout — if user is still on the page after 1.5s, app is not installed
+//   3. Show a clean info modal (not a browser error) with download link
 function connectToDLavie() {
-  // Try to open the launcher app via deep link
-  // The launcher should handle dlavie://connect and redirect back with auth token
-  const callbackUrl = encodeURIComponent(window.location.href);
+  const callbackUrl = encodeURIComponent(window.location.origin + window.location.pathname);
   const deepLink = `dlavie://connect?callback=${callbackUrl}`;
+  let appOpened = false;
 
-  // Attempt to open the deep link
-  window.location.href = deepLink;
+  // Track visibility change — if app opens, page becomes hidden
+  const visibilityHandler = () => {
+    if (document.hidden) {
+      appOpened = true;
+      document.removeEventListener('visibilitychange', visibilityHandler);
+    }
+  };
+  document.addEventListener('visibilitychange', visibilityHandler);
 
-  // Fallback: if the app didn't open (user stays on page), show a hint after 2s
+  // Try to open via window.location.href BUT catch the error
+  // Modern browsers (Safari iOS 16+, Chrome Android) support this pattern
+  // For older browsers, we use the iframe trick below
+  try {
+    // Use a hidden iframe to attempt the deep link — this does NOT trigger
+    // the browser's "cannot open page" error dialog if the app is not installed
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = deepLink;
+    document.body.appendChild(iframe);
+
+    // Remove iframe after 1.5s
+    setTimeout(() => {
+      try { document.body.removeChild(iframe); } catch (_) {}
+    }, 2000);
+  } catch (e) {
+    // Iframe failed — try window.location as last resort
+    // (this might trigger error dialog on some browsers, but it's the only way)
+    try {
+      window.location.href = deepLink;
+    } catch (_) {
+      // Silently fail — will show info modal below
+    }
+  }
+
+  // After 1.5s, check if app opened (page became hidden)
   setTimeout(() => {
-    const errEl = document.getElementById('loginError');
-    errEl.textContent = 'Launcher tidak terdeteksi. Silakan login manual dengan email & password di bawah.';
-    errEl.classList.add('show');
-  }, 2500);
+    document.removeEventListener('visibilitychange', visibilityHandler);
+    if (!appOpened && !document.hidden) {
+      // App not installed — show clean info modal (NOT browser error)
+      showConnectInfoModal();
+    }
+    // If appOpened is true, the launcher is now open and will redirect back
+    // with ?token=...&uid=... — handled by autoLoginFromURL() on page load
+  }, 1500);
+}
+
+// ─── Show "Connect to DLavie" info modal (when launcher not installed) ───
+function showConnectInfoModal() {
+  // Reuse the auth modal structure but with custom content
+  const modal = document.getElementById('authModal');
+  const card = modal.querySelector('.modal-card');
+  card.innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">Connect to DLavie</div>
+      <button class="modal-close" onclick="closeAuthModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p class="modal-subtitle">
+      Untuk connect langsung dari launcher, pastikan:
+    </p>
+    <div style="margin: 20px 0; padding: 16px; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-stroke); border-radius: 12px;">
+      <div style="display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start;">
+        <div style="flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--text-white); color: var(--pure-black); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">1</div>
+        <div style="flex: 1; font-size: 14px; color: var(--soft-text); line-height: 1.5;">
+          <strong style="color: var(--text-white);">Install DLavie Launcher</strong><br>
+          Download dari GitHub Releases (gratis, ~26 MB).
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start;">
+        <div style="flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--text-white); color: var(--pure-black); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">2</div>
+        <div style="flex: 1; font-size: 14px; color: var(--soft-text); line-height: 1.5;">
+          <strong style="color: var(--text-white);">Login di Launcher</strong><br>
+          Buka launcher, login dengan akun DLavie Anda.
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--text-white); color: var(--pure-black); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">3</div>
+        <div style="flex: 1; font-size: 14px; color: var(--soft-text); line-height: 1.5;">
+          <strong style="color: var(--text-white);">Klik "Connect" dari Launcher</strong><br>
+          Launcher akan redirect balik ke web ini dengan akun terdeteksi.
+        </div>
+      </div>
+    </div>
+    <button class="btn-connect-dlavie" onclick="downloadLatestLauncher(); closeAuthModal();" style="margin-bottom: 12px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Download Launcher
+    </button>
+    <div class="auth-divider">atau</div>
+    <button class="btn-connect-dlavie" onclick="restoreAuthModal(); switchAuthMode('login');" style="background: transparent; color: var(--text-white); border: 1px solid var(--glass-stroke);">
+      Login Manual dengan Email
+    </button>
+  `;
+  modal.classList.add('open');
+}
+
+// ─── Restore auth modal to original content ───
+function restoreAuthModal() {
+  const modal = document.getElementById('authModal');
+  const card = modal.querySelector('.modal-card');
+  card.innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title" id="authModalTitle">Masuk ke DLavie</div>
+      <button class="modal-close" onclick="closeAuthModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p class="modal-subtitle" id="authModalSubtitle">
+      Login dengan akun DLavie Launcher untuk membuat issue.
+    </p>
+    <button class="btn-connect-dlavie" onclick="connectToDLavie()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+      Connect to DLavie
+    </button>
+    <div class="auth-divider">atau login manual</div>
+    <div id="loginForm">
+      <div class="auth-form-group">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="loginEmail" placeholder="kamu@email.com" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Password</label>
+        <input type="password" class="auth-input" id="loginPassword" placeholder="••••••••" />
+      </div>
+      <div class="auth-error" id="loginError"></div>
+      <button class="btn-connect-dlavie" onclick="performLogin()" style="margin-top:8px;">
+        Masuk
+      </button>
+    </div>
+    <div id="registerForm" style="display:none;">
+      <div class="auth-form-group">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="regEmail" placeholder="kamu@email.com" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Password</label>
+        <input type="password" class="auth-input" id="regPassword" placeholder="Min 6 karakter" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Username</label>
+        <input type="text" class="auth-input" id="regUsername" placeholder="3-24 huruf/angka/_" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Display Name</label>
+        <input type="text" class="auth-input" id="regDisplayName" placeholder="Nama tampilan" />
+      </div>
+      <div class="auth-error" id="regError"></div>
+      <button class="btn-connect-dlavie" onclick="performRegister()" style="margin-top:8px;">
+        Daftar
+      </button>
+    </div>
+    <div class="auth-switch" id="authSwitch">
+      Belum punya akun? <a onclick="switchAuthMode('register')">Daftar di sini</a>
+    </div>
+  `;
+}
+
+// ─── Auto-login from URL params (when launcher redirects back) ───
+// Launcher can redirect to: https://drmacze.github.io/dlavie-faq/?token=JWT&uid=USER_ID&email=...
+// We auto-login using those params, then clean the URL
+async function autoLoginFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  const uid = params.get('uid');
+  const email = params.get('email');
+
+  if (!token || !uid) return false;
+
+  // Save session
+  saveSession(token, '', uid, email || '');
+
+  // Fetch profile
+  const profile = await fetchUserProfile(uid, token);
+  if (profile) {
+    currentUser = {
+      id: profile.id,
+      email: email || '',
+      username: profile.username,
+      display_name: profile.display_name,
+      avatar_url: profile.avatar_url,
+      role: profile.role
+    };
+    updateNavUser();
+    showToast('Berhasil connect dengan launcher!');
+
+    // Clean URL (remove token params for security)
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+
+    // If there's a pending issue creation, open it
+    if (window._pendingIssueCreation) {
+      window._pendingIssueCreation = false;
+      setTimeout(() => openCreateIssueModal(), 500);
+    }
+    return true;
+  } else {
+    clearSession();
+    return false;
+  }
 }
 
 // ─── Login ───
@@ -3772,11 +3965,19 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ─── Init: restore session + load issues on page load ───
-restoreSession().then(() => {
-  // Load issues after session restore (so we know if user is logged in)
+// ─── Init: check URL params for auto-login, then restore session, then load issues ───
+(async function init() {
+  // 1. Check if launcher redirected back with token (auto-login)
+  const autoLoggedIn = await autoLoginFromURL();
+
+  // 2. If not auto-logged in, try restore session from localStorage
+  if (!autoLoggedIn) {
+    await restoreSession();
+  }
+
+  // 3. Load issues list
   loadIssues();
-});
+})();
 
 </script>
 

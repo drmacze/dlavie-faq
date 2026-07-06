@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="description" content="FAQ DLavie Launcher — panduan instalasi, akun, mod, dan troubleshooting untuk komunitas FIFA 16 Mobile mod." />
+<title>DLavie FAQ — Launcher Komunitas FIFA 16 Mobile</title>
+
+<!-- Preconnect untuk font -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+
+<!-- Fonts: Clash Display (headline), Space Grotesk (body), JetBrains Mono (code) -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet" />
+
+<!-- GSAP + ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<!-- Lenis smooth scroll -->
+<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+
+<style>
+  /* ═══════════════════════════════════════════════════════════════
+     DLavie FAQ — Pure Monochrome + Halftone
+     Brand: #000 bg, white text, animated dot pattern
+     ═══════════════════════════════════════════════════════════════ */
+
+  :root {
+    --pure-black: #000000;
+    --carbon: #0A0A0A;
+    --surface-1: #0E0E0E;
+    --surface-2: #141414;
+    --text-white: #FFFFFF;
+    --soft-text: #CCCCCC;
+    --sub-text: #888888;
+    --dim-text: #555555;
+    --glass-stroke: rgba(255, 255, 255, 0.10);
+    --glass-stroke-hi: rgba(255, 255, 255, 0.20);
+    --hairline: rgba(255, 255, 255, 0.05);
+    --accent: #FFFFFF;
+    --danger: #FF4444;
+    --amber: #FFAA00;
+    --success: #00D26A;
+
+    --font-display: 'Clash Display', 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-pill: 999px;
+
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto; /* Lenis handles smooth scroll */
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--pure-black);
+    color: var(--text-white);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     HALFTONE ANIMATED BACKGROUND — cinematic, slow drift
+     ═══════════════════════════════════════════════════════════════ */
+  .halftone-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background: var(--pure-black);
+  }
+
+  .halftone-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.85;
+    mix-blend-mode: screen;
+  }
+
+  /* Glow orb for cinematic depth */
+  .glow-orb {
+    position: fixed;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 30%, transparent 60%);
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: -1;
+    will-change: transform;
+  }
+
+  .glow-orb-1 {
+    top: -200px;
+    right: -200px;
+    animation: orb-drift-1 20s ease-in-out infinite alternate;
+  }
+
+  .glow-orb-2 {
+    bottom: -200px;
+    left: -200px;
+    animation: orb-drift-2 25s ease-in-out infinite alternate;
+  }
+
+  @keyframes orb-drift-1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-200px, 200px) scale(1.2); }
+  }
+
+  @keyframes orb-drift-2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(200px, -200px) scale(0.9); }
+  }
+
+  /* Vignette overlay for cinematic depth */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(0,0,0,0.6) 100%),
+      radial-gradient(ellipse at top, rgba(255,255,255,0.03) 0%, transparent 60%);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════════════════════════ */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: backdrop-filter 0.4s, background 0.4s, border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+
+  .nav.scrolled {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text-white);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--text-white);
+    color: var(--pure-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    font-family: var(--font-display);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-logo-mark::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.1) 2px,
+      rgba(0,0,0,0.1) 4px
+    );
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: var(--soft-text);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    transition: color 0.25s, background 0.25s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: var(--text-white);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .nav-link.active {
+    color: var(--pure-black);
+    background: var(--text-white);
+  }
+
+  .nav-cta {
+    text-decoration: none;
+    color: var(--pure-black);
+    background: var(--text-white);
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 600;
+    transition: transform 0.25s, box-shadow 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(255,255,255,0.15);
+  }
+
+  .nav-cta svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-white);
+    cursor: pointer;
+    padding: 8px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════════════ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 120px 32px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    color: var(--soft-text);
+    margin-bottom: 32px;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero-badge-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--success);
+    color: var(--pure-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 9vw, 140px);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+    max-width: 1200px;
+  }
+
+  .hero-title .word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  .hero-title .word-inner {
+    display: inline-block;
+    transform: translateY(110%);
+  }
+
+  .hero-title .accent {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--sub-text);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(16px, 1.4vw, 19px);
+    color: var(--soft-text);
+    max-width: 620px;
+    line-height: 1.55;
+    margin-bottom: 48px;
+    font-weight: 400;
+  }
+
+  .hero-search {
+    width: 100%;
+    max-width: 560px;
+    position: relative;
+  }
+
+  .hero-search-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-pill);
+    padding: 18px 24px 18px 56px;
+    color: var(--text-white);
+    font-family: var(--font-body);
+    font-size: 15px;
+    transition: border-color 0.3s, background 0.3s;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero-search-input::placeholder {
+    color: var(--sub-text);
+  }
+
+  .hero-search-input:focus {
+    outline: none;
+    border-color: var(--glass-stroke-hi);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .hero-search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sub-text);
+    pointer-events: none;
+  }
+
+  .hero-search-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 64px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat-num {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text-white);
+  }
+
+  .hero-stat-label {
+    font-size: 11px;
+    color: var(--sub-text);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  /* Scroll indicator */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--dim-text);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .scroll-indicator-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--dim-text), transparent);
+    animation: scroll-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scroll-pulse {
+    0%, 100% { transform: scaleY(1); transform-origin: top; }
+    50% { transform: scaleY(0.5); transform-origin: top; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     CATEGORIES — pill filter bar
+     ═══════════════════════════════════════════════════════════════ */
+  .categories-section {
+    padding: 80px 32px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--sub-text);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 20px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--sub-text);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 40px;
+    max-width: 800px;
+  }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .category-pill {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-stroke);
+    color: var(--soft-text);
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s var(--ease-out-expo);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+  }
+
+  .category-pill:hover {
+    border-color: var(--glass-stroke-hi);
+    color: var(--text-white);
+    transform: translateY(-1px);
+  }
+
+  .category-pill.active {
+    background: var(--text-white);
+    color: var(--pure-black);
+    border-color: var(--text-white);
+  }
+
+  .category-pill-count {
+    font-size: 10px;
+    opacity: 0.6;
+    font-family: var(--font-mono);
+    padding: 2px 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+  }
+
+  .category-pill.active .category-pill-count {
+    background: rgba(0,0,0,0.15);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     FAQ ACCORDION
+     ═══════════════════════════════════════════════════════════════ */
+  .faq-section {
+    padding: 40px 32px 120px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--hairline);
+    overflow: hidden;
+  }
+
+  .faq-item:first-child {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 0;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    color: var(--text-white);
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    transition: color 0.3s;
+  }
+
+  .faq-question:hover {
+    color: var(--soft-text);
+  }
+
+  .faq-question-cat {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--sub-text);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 400;
+  }
+
+  .faq-question-text {
+    flex: 1;
+  }
+
+  .faq-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-stroke);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.4s var(--ease-out-expo);
+    color: var(--soft-text);
+  }
+
+  .faq-item.open .faq-icon {
+    background: var(--text-white);
+    color: var(--pure-black);
+    border-color: var(--text-white);
+    transform: rotate(45deg);
+  }
+
+  .faq-icon svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s var(--ease-out-expo);
+  }
+
+  .faq-answer-inner {
+    padding: 0 60px 32px 0;
+    color: var(--soft-text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .faq-answer-inner p {
+    margin-bottom: 14px;
+  }
+
+  .faq-answer-inner p:last-child {
+    margin-bottom: 0;
+  }
+
+  .faq-answer-inner strong {
+    color: var(--text-white);
+    font-weight: 600;
+  }
+
+  .faq-answer-inner code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--text-white);
+    border: 1px solid var(--hairline);
+  }
+
+  .faq-answer-inner ul {
+    margin: 12px 0;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .faq-answer-inner li {
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 8px;
+  }
+
+  .faq-answer-inner li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 12px;
+    height: 1px;
+    background: var(--sub-text);
+  }
+
+  .faq-answer-inner a {
+    color: var(--text-white);
+    text-decoration: none;
+    border-bottom: 1px solid var(--glass-stroke);
+    transition: border-color 0.3s;
+  }
+
+  .faq-answer-inner a:hover {
+    border-color: var(--text-white);
+  }
+
+  .faq-answer-inner .callout {
+    background: rgba(255,170,0,0.06);
+    border: 1px solid rgba(255,170,0,0.25);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .faq-answer-inner .callout-icon {
+    flex-shrink: 0;
+    color: var(--amber);
+    margin-top: 2px;
+  }
+
+  .faq-answer-inner .callout-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .faq-answer-inner .callout-text {
+    color: var(--soft-text);
+    font-size: 14px;
+  }
+
+  .faq-empty {
+    text-align: center;
+    padding: 80px 24px;
+    color: var(--sub-text);
+  }
+
+  .faq-empty-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--text-white);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     CTA SECTION
+     ═══════════════════════════════════════════════════════════════ */
+  .cta-section {
+    padding: 120px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+
+  .cta-subtitle {
+    color: var(--soft-text);
+    font-size: 17px;
+    margin-bottom: 40px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .btn-primary, .btn-secondary {
+    text-decoration: none;
+    padding: 16px 28px;
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform 0.25s, box-shadow 0.25s, background 0.25s, border-color 0.25s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--text-white);
+    color: var(--pure-black);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(255,255,255,0.18);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-white);
+    border: 1px solid var(--glass-stroke);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--glass-stroke-hi);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .btn-primary svg, .btn-secondary svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════════ */
+  .footer {
+    border-top: 1px solid var(--hairline);
+    padding: 48px 32px 32px;
+    text-align: center;
+    position: relative;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--soft-text);
+    margin-bottom: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .footer-link {
+    color: var(--sub-text);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .footer-link:hover {
+    color: var(--text-white);
+  }
+
+  .footer-link svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .footer-copy {
+    color: var(--dim-text);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     REVEAL ANIMATIONS (GSAP target classes)
+     ═══════════════════════════════════════════════════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .reveal-line {
+    overflow: hidden;
+    display: block;
+  }
+
+  .reveal-line-inner {
+    display: block;
+    transform: translateY(110%);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RESPONSIVE
+     ═══════════════════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .nav {
+      padding: 16px 20px;
+    }
+
+    .nav-links {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: block;
+    }
+
+    .hero {
+      padding: 100px 20px 60px;
+    }
+
+    .hero-stats {
+      gap: 32px;
+    }
+
+    .hero-stat-num {
+      font-size: 26px;
+    }
+
+    .categories-section,
+    .faq-section {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .faq-question {
+      font-size: 17px;
+      padding: 22px 0;
+    }
+
+    .faq-answer-inner {
+      padding-right: 0;
+    }
+
+    .faq-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .cta-section {
+      padding: 80px 20px;
+    }
+
+    .footer {
+      padding: 40px 20px 24px;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     MOBILE MENU
+     ═══════════════════════════════════════════════════════════════ */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    background: var(--pure-black);
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  .mobile-menu.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-menu a {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: var(--text-white);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     REDUCED MOTION
+     ═══════════════════════════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal, .reveal-line-inner {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HALFTONE CANVAS BACKGROUND
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="halftone-bg">
+  <canvas class="halftone-canvas" id="halftoneCanvas"></canvas>
+</div>
+<div class="glow-orb glow-orb-1"></div>
+<div class="glow-orb glow-orb-2"></div>
+<div class="vignette"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════════════════════════ -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-mark">D</span>
+    <span>DLavie</span>
+  </a>
+  <ul class="nav-links">
+    <li><a class="nav-link" href="#instalasi">Instalasi</a></li>
+    <li><a class="nav-link" href="#akun">Akun</a></li>
+    <li><a class="nav-link" href="#mods">Mods</a></li>
+    <li><a class="nav-link" href="#game">Game</a></li>
+    <li><a class="nav-link" href="#troubleshooting">Troubleshooting</a></li>
+  </ul>
+  <a href="https://github.com/drmacze/F16-Launcher/releases" target="_blank" rel="noopener" class="nav-cta">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.2L19.5 8 12 11.8 4.5 8 12 4.2zM4 9.4l7 3.5v7.2l-7-3.5V9.4zm9 10.7v-7.2l7-3.5v7.2l-7 3.5z"/></svg>
+    Download
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#instalasi" data-mobile-link>Instalasi</a>
+  <a href="#akun" data-mobile-link>Akun</a>
+  <a href="#mods" data-mobile-link>Mods</a>
+  <a href="#game" data-mobile-link>Game</a>
+  <a href="#troubleshooting" data-mobile-link>Troubleshooting</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot">✓</span>
+    <span>v7.9.17 — Onboarding Modal + Edit Profile Fix</span>
+  </div>
+
+  <h1 class="hero-title" id="heroTitle">
+    <span class="word"><span class="word-inner">Pertanyaan</span></span>
+    <span class="word"><span class="word-inner">yang</span></span>
+    <span class="word"><span class="word-inner">sering</span></span>
+    <br>
+    <span class="word"><span class="word-inner accent">ditanyakan.</span></span>
+  </h1>
+
+  <p class="hero-subtitle" id="heroSubtitle">
+    Semua yang perlu kamu tahu tentang DLavie Launcher — instalasi, akun,
+    mod FIFA 16/15, patch system, dan troubleshooting. Cari atau pilih kategori.
+  </p>
+
+  <div class="hero-search" id="heroSearch">
+    <span class="hero-search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </span>
+    <input
+      type="text"
+      class="hero-search-input"
+      id="searchInput"
+      placeholder="Cari pertanyaan… (misal: 'install', 'lupa password', 'patch')"
+      aria-label="Cari FAQ"
+    />
+  </div>
+
+  <div class="hero-stats" id="heroStats">
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-count="32">0</div>
+      <div class="hero-stat-label">Pertanyaan</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-count="6">0</div>
+      <div class="hero-stat-label">Kategori</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-count="10">0</div>
+      <div class="hero-stat-label">Bahasa</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num" data-count="187">0</div>
+      <div class="hero-stat-label">Versi Terbaru</div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-indicator-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CATEGORIES
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="categories-section" id="categoriesSection">
+  <div class="section-label reveal">Kategori</div>
+  <h2 class="section-title reveal">Pilih topik atau cari pertanyaan.</h2>
+
+  <div class="categories" id="categories">
+    <button class="category-pill active" data-cat="all">
+      Semua <span class="category-pill-count" id="count-all">0</span>
+    </button>
+    <button class="category-pill" data-cat="instalasi">
+      Instalasi <span class="category-pill-count" id="count-instalasi">0</span>
+    </button>
+    <button class="category-pill" data-cat="akun">
+      Akun & Profil <span class="category-pill-count" id="count-akun">0</span>
+    </button>
+    <button class="category-pill" data-cat="mods">
+      Mods & Patch <span class="category-pill-count" id="count-mods">0</span>
+    </button>
+    <button class="category-pill" data-cat="game">
+      Game FIFA <span class="category-pill-count" id="count-game">0</span>
+    </button>
+    <button class="category-pill" data-cat="troubleshooting">
+      Troubleshooting <span class="category-pill-count" id="count-troubleshooting">0</span>
+    </button>
+    <button class="category-pill" data-cat="keamanan">
+      Keamanan <span class="category-pill-count" id="count-keamanan">0</span>
+    </button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FAQ LIST
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="faq-section">
+  <div id="faqList"><!-- FAQ items injected by JS --></div>
+  <div class="faq-empty" id="faqEmpty" style="display:none;">
+    <div class="faq-empty-title">Tidak ada hasil</div>
+    <p>Coba kata kunci lain atau pilih kategori berbeda.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CTA
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <h2 class="cta-title reveal">Masih bingung?<br>Tanya komunitas.</h2>
+  <p class="cta-subtitle reveal">
+    Gabung Discord atau buat issue di GitHub. Tim dan komunitas akan bantu.
+  </p>
+  <div class="cta-buttons reveal">
+    <a href="https://github.com/drmacze/F16-Launcher/issues/new" target="_blank" rel="noopener" class="btn-primary">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+      Buka Issue
+    </a>
+    <a href="https://github.com/drmacze/F16-Launcher" target="_blank" rel="noopener" class="btn-secondary">
+      Lihat Repo
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-logo">DLAVIE LAUNCHER</div>
+  <div class="footer-links">
+    <a href="https://github.com/drmacze/F16-Launcher" target="_blank" rel="noopener" class="footer-link">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+      GitHub
+    </a>
+    <a href="https://github.com/drmacze/F16-Launcher/releases" target="_blank" rel="noopener" class="footer-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      Releases
+    </a>
+    <a href="https://github.com/drmacze/DLavie-Dev-Dashboard" target="_blank" rel="noopener" class="footer-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dev Dashboard
+    </a>
+  </div>
+  <div class="footer-copy">© 2026 DLavie Company · Built with GSAP + Lenis · Pure Monochrome + Halftone</div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   FAQ DATA
+   ═══════════════════════════════════════════════════════════════ */
+const FAQ_DATA = [
+  // ─── INSTALASI ───
+  {
+    cat: 'instalasi',
+    q: 'Bagaimana cara install DLavie Launcher?',
+    a: `
+      <p>DLavie Launcher didistribusikan via <strong>GitHub Releases</strong>. Langkah-langkah:</p>
+      <ul>
+        <li>Buka <a href="https://github.com/drmacze/F16-Launcher/releases" target="_blank" rel="noopener">halaman Releases</a> di browser HP Android kamu.</li>
+        <li>Download file <code>DLavie26-Launcher-debug.apk</code> (sekitar 25 MB).</li>
+        <li>Buka file manager → tap APK → izinkan install dari sumber tidak dikenal jika diminta.</li>
+        <li>Setelah terinstall, buka DLavie Launcher → register atau login.</li>
+      </ul>
+      <div class="callout">
+        <span class="callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="callout-text">Pastikan Android kamu versi <strong>7.0 (SDK 24)</strong> atau lebih baru. Untuk Android 14/15/16, gunakan build <code>v7.9.17</code> atau yang lebih baru.</span>
+      </div>
+    `
+  },
+  {
+    cat: 'instalasi',
+    q: 'Kenapa harus uninstall versi lama dulu?',
+    a: `
+      <p>Setiap rilis besar DLavie kadang mengubah <strong>signing key</strong> APK. Android menolak install APK baru kalau signature-nya berbeda dari versi lama yang sudah terinstall. Itu sebabnya kamu perlu uninstall dulu.</p>
+      <p>Data launcher (akun, settings, cache) tetap aman karena disimpan terpisah di <code>/data/data/com.drmacze.f16launcher/</code>.</p>
+      <p>Setelah uninstall, install APK baru → login pakai akun yang sama → semua data komunitas (posts, followers, dll) otomatis sinkron dari Supabase.</p>
+    `
+  },
+  {
+    cat: 'instalasi',
+    q: 'Apa persyaratan sistem minimum?',
+    a: `
+      <ul>
+        <li><strong>Android 7.0 (SDK 24)</strong> atau lebih baru.</li>
+        <li>RAM minimal 3 GB (4 GB+ disarankan untuk FIFA 16).</li>
+        <li>Penyimpanan bebas minimum <strong>3 GB</strong> (untuk base data FIFA 16 + OBB).</li>
+        <li>Koneksi internet untuk register, login, dan download mod.</li>
+        <li>Untuk patch system: <strong>Shizuku</strong> aktif atau <strong>root access</strong>.</li>
+      </ul>
+      <p>Launcher sendiri ukurannya cuma ~25 MB, tapi game FIFA 16 butuh ~2.7 GB untuk base data lengkap.</p>
+    `
+  },
+  {
+    cat: 'instalasi',
+    q: 'Bagaimana cara install FIFA 16 Mobile mod via launcher?',
+    a: `
+      <p>DLavie Launcher punya installer terintegrasi yang handle semuanya:</p>
+      <ul>
+        <li>Buka launcher → tab <strong>GameHub</strong>.</li>
+        <li>Pilih <strong>FIFA 16 Mobile</strong> → tap <strong>Install</strong>.</li>
+        <li>Launcher akan download 3 file otomatis: APK (32 MB), DATA zip (1.34 GB), OBB zip (1.31 GB).</li>
+        <li>Setelah download, file diekstrak dan di-copy ke <code>/sdcard/Android/data/com.ea.gp.fifaworld/</code> via Shizuku/root.</li>
+        <li>Setelah selesai, tombol berubah jadi <strong>Play</strong> → tap untuk buka game.</li>
+      </ul>
+      <div class="callout">
+        <span class="callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="callout-text">Installasi butuh <strong>Shizuku</strong> aktif. Kalau belum, launcher akan minta setup Shizuku dulu (1 menit, ikuti instruksi di layar).</span>
+      </div>
+    `
+  },
+  {
+    cat: 'instalasi',
+    q: 'Bisakah install launcher di iPhone atau PC?',
+    a: `
+      <p>Tidak. DLavie Launcher hanya untuk <strong>Android</strong>. FIFA 16 Mobile mod juga cuma ada APK Android. iOS dan PC tidak didukung.</p>
+      <p>Untuk PC, alternatifnya adalah main FIFA 16 PC version atau pakai emulator Android (BlueStacks/LDPlayer) — tapi experience-nya tidak optimal dan tidak officially didukung.</p>
+    `
+  },
+
+  // ─── AKUN & PROFIL ───
+  {
+    cat: 'akun',
+    q: 'Bagaimana cara register akun DLavie?',
+    a: `
+      <p>Buka launcher → di layar login, pilih <strong>Register</strong>. Isi form:</p>
+      <ul>
+        <li><strong>Email</strong> — valid dan aktif (untuk konfirmasi & reset password).</li>
+        <li><strong>Password</strong> — minimal 6 karakter.</li>
+        <li><strong>Username</strong> — 3-24 karakter, huruf/angka/underscore. Unique, nggak bisa sama dengan user lain.</li>
+        <li><strong>Display Name</strong> — 2-40 karakter, bebas (bisa diubah nanti).</li>
+      </ul>
+      <p>Setelah register, kamu akan diminta onboarding modal (1x saja) untuk pilih <strong>user type</strong> (Player/Modder/Explorer) dan <strong>use case</strong>.</p>
+    `
+  },
+  {
+    cat: 'akun',
+    q: 'Bagaimana cara edit profil (avatar, nama, bio)?',
+    a: `
+      <p>Sejak versi <strong>v7.9.17</strong>, tombol "Edit Profile" sekarang buka form edit langsung (sebelumnya bug — malah buka Settings). Cara edit:</p>
+      <ul>
+        <li>Buka tab <strong>Profile</strong>.</li>
+        <li>Tap tombol <strong>Edit Profile</strong> (pill putih dengan icon pensil, di bawah bio).</li>
+        <li>Form edit akan terbuka dengan field: avatar, full name, phone, email, username, bio.</li>
+        <li>Tap avatar untuk ganti foto dari galeri. Tap <strong>Save Changes</strong> untuk simpan.</li>
+      </ul>
+      <div class="callout">
+        <span class="callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="callout-text">Avatar di-upload ke Supabase Storage. Maksimum ukuran file sekitar 2 MB. Format: JPG/PNG/WebP.</span>
+      </div>
+    `
+  },
+  {
+    cat: 'akun',
+    q: 'Lupa password, bagaimana cara reset?',
+    a: `
+      <p>Di layar login, tap <strong>"Forgot password?"</strong> di bawah tombol Login. Masukkan email akun kamu → link reset akan dikirim ke email.</p>
+      <p>Ikuti link di email untuk set password baru. Kalau email tidak masuk dalam 5 menit:</p>
+      <ul>
+        <li>Cek folder <strong>Spam</strong> / <strong>Promotions</strong>.</li>
+        <li>Pastikan email yang dimasukkan benar (coba login dulu untuk verifikasi).</li>
+        <li>Email pengirim: <code>noreply@mail.app.supabase.net</code>.</li>
+      </ul>
+    `
+  },
+  {
+    cat: 'akun',
+    q: 'Apa itu PIN Launcher dan bagaimana cara setup?',
+    a: `
+      <p>PIN Launcher adalah <strong>6-digit PIN</strong> yang dipakai untuk mengunci akses ke launcher. Setiap kali buka launcher, kamu harus input PIN dulu sebelum bisa masuk.</p>
+      <p>Cara setup:</p>
+      <ul>
+        <li>Buka <strong>Profile</strong> → <strong>Settings</strong> (gear icon kanan atas).</li>
+        <li>Buka <strong>Account & Security</strong> section.</li>
+        <li>Tap <strong>PIN Launcher</strong> → <strong>Setup PIN 6-digit</strong>.</li>
+        <li>Masukkan 6 digit angka → confirm.</li>
+      </ul>
+      <p>PIN disimpan lokal di device (EncryptedSharedPreferences), bukan di server. Artinya PIN berbeda-beda per device — kalau login di HP lain, PIN perlu di-setup ulang.</p>
+      <p>Untuk <strong>ubah PIN</strong>: masukkan PIN lama lalu PIN baru. Untuk <strong>nonaktifkan</strong>: tap "Nonaktifkan PIN" (perlu PIN lama).</p>
+    `
+  },
+  {
+    cat: 'akun',
+    q: 'Bagaimana cara ganti email akun?',
+    a: `
+      <p>Ganti email dilakukan via Supabase Auth (bukan langsung di tabel profiles):</p>
+      <ul>
+        <li>Buka <strong>Profile</strong> → <strong>Settings</strong> → <strong>Account & Security</strong>.</li>
+        <li>Tap <strong>Ganti Email</strong>.</li>
+        <li>Masukkan email baru → tap <strong>Kirim Konfirmasi</strong>.</li>
+        <li>Email konfirmasi dikirim ke email baru. Buka email → tap link untuk verifikasi.</li>
+      </ul>
+      <p>Email lama tetap aktif sampai verifikasi selesai. Setelah verifikasi, login pakai email baru.</p>
+    `
+  },
+  {
+    cat: 'akun',
+    q: 'Bagaimana cara follow / unfollow user lain?',
+    a: `
+      <p>Di launcher, kamu bisa follow user lain dari beberapa tempat:</p>
+      <ul>
+        <li>Di <strong>Community feed</strong> → tap username di post card.</li>
+        <li>Di hasil search user (tab Community → search).</li>
+        <li>Di profil user lain → tap tombol <strong>Follow</strong>.</li>
+      </ul>
+      <p>Untuk unfollow, tap tombol <strong>Following</strong> di profil user tersebut. Daftar siapa yang kamu follow bisa dilihat di profil sendiri → tap angka <strong>Following</strong>.</p>
+    `
+  },
+  {
+    cat: 'akun',
+    q: 'Bisakah block user yang toxic?',
+    a: `
+      <p>Ya. Sejak v3.1, kamu bisa block user lain. Cara:</p>
+      <ul>
+        <li>Buka daftar <strong>Followers</strong> atau <strong>Following</strong> (tap angka di profil).</li>
+        <li><strong>Long-press</strong> row user yang mau di-block.</li>
+        <li>Pilih <strong>Block User</strong> atau <strong>Report User</strong>.</li>
+      </ul>
+      <p>Block = user tersebut tidak bisa follow kamu, lihat post kamu, atau kirim pesan. Block bisa di-unblock kapan saja via Settings.</p>
+    `
+  },
+
+  // ─── MODS & PATCH ───
+  {
+    cat: 'mods',
+    q: 'Apa perbedaan base data dan patch?',
+    a: `
+      <p><strong>Base data</strong> = file lengkap FIFA 16 Mobile mod (~2.7 GB). Di-download sekali saat pertama install. Berisi APK + DATA + OBB.</p>
+      <p><strong>Patch</strong> = file kecil (5-50 MB) yang berisi perubahan/update mod. Di-download setelah base data terinstall. Patch bisa berupa:</p>
+      <ul>
+        <li><strong>Inline patch</strong> — file kecil langsung di-copy ke folder game.</li>
+        <li><strong>ZIP patch</strong> — arsip zip yang diekstrak ke folder game.</li>
+      </ul>
+      <p>Patch di-host di GitHub repo <a href="https://github.com/drmacze/F16" target="_blank" rel="noopener">drmacze/F16</a> dan otomatis terdeteksi oleh launcher via <code>updates/latest.json</code> manifest.</p>
+    `
+  },
+  {
+    cat: 'mods',
+    q: 'Bagaimana cara apply patch?',
+    a: `
+      <p>Patch di-apply otomatis oleh launcher saat kamu tap <strong>Update</strong> di tab GameHub atau Home. Proses:</p>
+      <ul>
+        <li>Launcher cek <code>updates/latest.json</code> di repo F16 → bandingkan dengan versi yang sudah terinstall.</li>
+        <li>Kalau ada versi baru, tombol "Update" muncul.</li>
+        <li>Tap → launcher download patch (ZIP) → verifikasi SHA256 → extract → copy ke folder game via Shizuku.</li>
+        <li>Setelah selesai, game siap dimainkan dengan mod terbaru.</li>
+      </ul>
+      <p>Patch kritis (yang nggak bisa skip) akan otomatis di-apply. Patch opsional bisa di-skip.</p>
+    `
+  },
+  {
+    cat: 'mods',
+    q: 'Apa itu Shizuku dan kenapa dibutuhkan?',
+    a: `
+      <p><strong>Shizuku</strong> adalah aplikasi Android yang mengizinkan aplikasi lain (seperti DLavie Launcher) menjalankan operasi sistem <strong>tanpa root</strong>. DLavie pakai Shizuku untuk:</p>
+      <ul>
+        <li>Copy file mod ke <code>/sdcard/Android/data/com.ea.gp.fifaworld/</code> (Android 11+ restricted folder).</li>
+        <li>Apply patch yang butuh akses file system.</li>
+        <li>Backup/rollback patch.</li>
+      </ul>
+      <p>Cara setup Shizuku (1 menit):</p>
+      <ul>
+        <li>Download <strong>Shizuku</strong> dari Play Store atau <a href="https://shizuku.rikka.app/" target="_blank" rel="noopener">shizuku.rikka.app</a>.</li>
+        <li>Buka Shizuku → ikuti instruksi (biasanya via ADB wireless).</li>
+        <li>Buka DLavie Launcher → Settings → <strong>Shizuku Setup</strong> → grant permission.</li>
+      </ul>
+      <p>Setelah Shizuku aktif, semua operasi file system jalan otomatis. Kalau HP kamu sudah <strong>rooted</strong>, Shizuku tidak wajib — launcher bisa pakai root langsung.</p>
+    `
+  },
+  {
+    cat: 'mods',
+    q: 'Bisakah rollback ke patch versi lama?',
+    a: `
+      <p>Ya. Sebelum apply patch baru, launcher otomatis backup versi lama ke folder <code>/sdcard/Android/data/com.ea.gp.fifaworld/.dlavie_backup/</code>. Untuk rollback:</p>
+      <ul>
+        <li>Buka <strong>GameHub</strong> → tap game FIFA 16 → <strong>Patch History</strong>.</li>
+        <li>Pilih versi yang mau di-restore → tap <strong>Restore</strong>.</li>
+        <li>Launcher akan restore file dari backup dan restart game.</li>
+      </ul>
+      <div class="callout">
+        <span class="callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="callout-text">Backup dihapus otomatis setelah 3 patch baru (untuk hemat storage). Kalau mau keep backup lama, copy manual ke folder lain.</span>
+      </div>
+    `
+  },
+  {
+    cat: 'mods',
+    q: 'Patch gagal apply, kenapa?',
+    a: `
+      <p>Beberapa kemungkinan penyebab:</p>
+      <ul>
+        <li><strong>Shizuku tidak aktif</strong> — buka Shizuku app, pastikan status "Running".</li>
+        <li><strong>Storage penuh</strong> — pastikan ada minimal 1 GB free space.</li>
+        <li><strong>SHA256 mismatch</strong> — file patch corrupt saat download. Hapus cache launcher, retry.</li>
+        <li><strong>Game sedang berjalan</strong> — close FIFA 16 dulu sebelum apply patch.</li>
+        <li><strong>Android 14+ restricted storage</strong> — pastikan Shizuku punya akses ke <code>Android/data</code> folder.</li>
+      </ul>
+      <p>Setelah fix penyebabnya, retry apply patch. Kalau masih gagal, lihat log di <strong>Settings → Diagnostics</strong> dan kirim ke <a href="https://github.com/drmacze/F16-Launcher/issues" target="_blank" rel="noopener">GitHub Issues</a>.</p>
+    `
+  },
+
+  // ─── GAME FIFA ───
+  {
+    cat: 'game',
+    q: 'Apa beda FIFA 15 dan FIFA 16 di DLavie Launcher?',
+    a: `
+      <p>Keduanya adalah game EA Sports FIFA Mobile, tapi versi beda dan dikelola berbeda:</p>
+      <ul>
+        <li><strong>FIFA 16 Mobile</strong> — game utama (<code>com.ea.gp.fifaworld</code>). Punya full mod system: base data, patches, backup, rollback. Source: <a href="https://github.com/drmacze/F16" target="_blank" rel="noopener">github.com/drmacze/F16</a>.</li>
+        <li><strong>FIFA 15 Mobile</strong> — game sekunder (<code>com.ea.game.fifa14_row</code>). Hanya base data install (APK + DATA + OBB via Supabase proxy). <strong>Tidak ada patch system</strong> dan <strong>tidak ada backup/rollback</strong>.</li>
+      </ul>
+      <p>FIFA 15 di-served via Supabase Edge Function <code>apk-proxy</code>, bukan GitHub Releases. Itu sebabnya tidak ada release history untuk FIFA 15.</p>
+    `
+  },
+  {
+    cat: 'game',
+    q: 'Kenapa FIFA 15 tidak punya patch system?',
+    a: `
+      <p>FIFA 15 bukan prioritas mod — fokus utama DLavie adalah FIFA 16. FIFA 15 dilayani sebagai "as-is" install (base data saja) untuk user yang masih mau main versi lama.</p>
+      <p>Kalau kamu mau kontribusi mod FIFA 15, bisa fork repo <a href="https://github.com/drmacze/F15" target="_blank" rel="noopener">drmacze/F15</a> (kalau ada) atau diskusi di GitHub Issues.</p>
+    `
+  },
+  {
+    cat: 'game',
+    q: 'Game crash setelah dibuka, apa yang salah?',
+    a: `
+      <p>Cek beberapa hal ini:</p>
+      <ul>
+        <li><strong>Base data tidak lengkap</strong> — pastikan installasi FIFA 16 selesai 100% (lihat di GameHub, status harus "Installed" bukan "Partial").</li>
+        <li><strong>Patch corrupt</strong> — coba rollback ke patch sebelumnya, lalu re-apply.</li>
+        <li><strong>Android version tidak kompatibel</strong> — gunakan build <code>v7.9.17+</code> yang support Android 14/15/16.</li>
+        <li><strong>Storage rendah</strong> — pastikan minimal 500 MB free RAM saat main.</li>
+        <li><strong>Game data hilang</strong> — bisa kena clear oleh Android cleaner app. Reinstall base data.</li>
+      </ul>
+      <p>Launcher punya <strong>Crash Reporter</strong> otomatis. Kalau crash terjadi, log terkirim ke server (anonim) untuk analisis. Kamu juga bisa lihat log lokal di <strong>Settings → Diagnostics → Crash Logs</strong>.</p>
+    `
+  },
+  {
+    cat: 'game',
+    q: 'Bagaimana cara cek status server FIFA 16/15?',
+    a: `
+      <p>Status server game ditampilkan langsung di Profile screen dan GameHub:</p>
+      <ul>
+        <li><strong>Online (hijau)</strong> — semua fitur komunitas aktif.</li>
+        <li><strong>Busy (kuning)</strong> — server ada beban tinggi, mungkin lambat.</li>
+        <li><strong>Maintenance (oranye)</strong> — sedang maintenance, coba lagi nanti.</li>
+        <li><strong>Offline (merah)</strong> — server down. Follow <a href="https://github.com/drmacze/F16-Launcher" target="_blank" rel="noopener">GitHub</a> untuk update.</li>
+      </ul>
+      <p>Status di-fetch dari Supabase table <code>app_config</code> key <code>game_server_status</code>, di-update real-time oleh admin via Dev Dashboard.</p>
+    `
+  },
+
+  // ─── TROUBLESHOOTING ───
+  {
+    cat: 'troubleshooting',
+    q: 'Launcher tidak menampilkan popup update padahal ada versi baru',
+    a: `
+      <p>Popup update muncul kalau ada row di Supabase <code>app_releases</code> dengan <code>version_code</code> lebih besar dari versi yang terinstall, dan <code>is_published = true</code>. Kalau popup tidak muncul:</p>
+      <ul>
+        <li><strong>Force-close launcher</strong> lalu buka lagi — AppUpdateChecker cek update setiap app launch.</li>
+        <li><strong>Cek koneksi internet</strong> — launcher butuh akses ke Supabase untuk cek versi.</li>
+        <li><strong>Versi terinstall mungkin sudah paling baru</strong> — cek di Settings → About → Version Code.</li>
+        <li><strong>Cache launcher corrupt</strong> — Settings → Clear Cache → restart.</li>
+      </ul>
+      <p>Kalau semua sudah dicoba dan popup tetap tidak muncul, install manual APK terbaru dari <a href="https://github.com/drmacze/F16-Launcher/releases" target="_blank" rel="noopener">GitHub Releases</a>.</p>
+    `
+  },
+  {
+    cat: 'troubleshooting',
+    q: 'Update gagal download ("Update file not found")',
+    a: `
+      <p>Error ini muncul kalau URL download APK di tabel <code>app_releases</code> tidak valid (404). Penyebab umum:</p>
+      <ul>
+        <li><strong>Release di GitHub masih draft</strong> — admin belum publish release-nya.</li>
+        <li><strong>Asset name di URL salah</strong> — harus konsisten dengan yang ada di GitHub Release (biasanya <code>DLavie26-Launcher-debug.apk</code>).</li>
+        <li><strong>Tag berubah</strong> — admin re-tag release, URL lama jadi 404.</li>
+      </ul>
+      <p>Solusi sementara: download manual dari <a href="https://github.com/drmacze/F16-Launcher/releases/latest" target="_blank" rel="noopener">Releases page</a>. Lapor ke admin via Discord atau GitHub Issues supaya URL di Supabase diperbaiki.</p>
+    `
+  },
+  {
+    cat: 'troubleshooting',
+    q: 'Login gagal terus, padahal email & password benar',
+    a: `
+      <p>Kemungkinan penyebab:</p>
+      <ul>
+        <li><strong>Akun belum terverifikasi</strong> — cek email untuk link konfirmasi.</li>
+        <li><strong>Email salah ketik</strong> — coba register ulang untuk cek apakah email sudah dipakai.</li>
+        <li><strong>Server Supabase down</strong> — cek status di <a href="https://status.supabase.com" target="_blank" rel="noopener">status.supabase.com</a>.</li>
+        <li><strong>JWT expired</strong> — clear data launcher, login ulang.</li>
+        <li><strong>Akun di-banned</strong> — kirim email ke admin kalau merasa kena banned salah.</li>
+      </ul>
+      <p>Untuk reset password, gunakan link <strong>"Forgot password?"</strong> di layar login.</p>
+    `
+  },
+  {
+    cat: 'troubleshooting',
+    q: 'Avatar tidak ter-upload setelah dipilih dari galeri',
+    a: `
+      <p>Avatar upload butuh koneksi internet dan token auth yang valid. Kalau gagal:</p>
+      <ul>
+        <li><strong>File terlalu besar</strong> — maksimum 2 MB. Crop/kompres dulu.</li>
+        <li><strong>Format tidak didukung</strong> — pakai JPG, PNG, atau WebP.</li>
+        <li><strong>Sesi expired</strong> — logout, login ulang, coba lagi.</li>
+        <li><strong>Permission storage ditolak</strong> — Settings → Apps → DLavie Launcher → grant storage permission.</li>
+      </ul>
+      <p>Setelah upload berhasil, avatar URL di-save ke <code>profiles.avatar_url</code> di Supabase. Cache avatar di-load via Coil (image loading library).</p>
+    `
+  },
+  {
+    cat: 'troubleshooting',
+    q: 'Notifikasi push tidak masuk',
+    a: `
+      <p>DLavie Launcher pakai Firebase Cloud Messaging (FCM) untuk push notification. Kalau notifikasi tidak masuk:</p>
+      <ul>
+        <li><strong>Google Play Services tidak ada</strong> — FCM butuh Play Services. Cek di Settings → Apps.</li>
+        <li><strong>Battery optimization</strong> — disable untuk DLavie Launcher (Settings → Battery → DLavie → Don't optimize).</li>
+        <li><strong>Notifikasi di-pause</strong> — di Settings launcher, pastikan "Pause notifications" toggle OFF.</li>
+        <li><strong>FCM token expired</strong> — logout, login ulang untuk refresh token.</li>
+      </ul>
+      <p>Notifikasi yang didukung: dev announcements, maintenance alerts, ticket replies, dan (untuk admin) moderation alerts.</p>
+    `
+  },
+  {
+    cat: 'troubleshooting',
+    q: 'Launcher lambat / lag di HP saya',
+    a: `
+      <p>Beberapa optimasi yang bisa kamu coba:</p>
+      <ul>
+        <li><strong>Disable halftone background</strong> — Settings → Developer → disable animated background.</li>
+        <li><strong>Clear cache</strong> — Settings → Storage → Clear Cache (tidak hapus data akun).</li>
+        <li><strong>Reduce simultaneous downloads</strong> — di Settings, set max parallel downloads ke 1.</li>
+        <li><strong>Close background apps</strong> — RAM terbatas adalah penyebab lag paling umum.</li>
+        <li><strong>Update ke versi terbaru</strong> — setiap rilis ada performance improvements.</li>
+      </ul>
+      <p>Kalau masih lag setelah semua optimasi, mungkin HP kamu di bawah minimum spec (lihat FAQ Instalasi).</p>
+    `
+  },
+
+  // ─── KEAMANAN ───
+  {
+    cat: 'keamanan',
+    q: 'Apakah data saya aman di DLavie Launcher?',
+    a: `
+      <p>Ya. DLavie Launcher menggunakan <strong>Supabase</strong> (PostgreSQL + Auth + Storage) sebagai backend dengan beberapa lapis keamanan:</p>
+      <ul>
+        <li><strong>Row-Level Security (RLS)</strong> — setiap tabel punya policy yang membatasi siapa yang bisa baca/tulis baris tertentu. User hanya bisa akses data sendiri.</li>
+        <li><strong>JWT Auth</strong> — token access disimpan di <code>EncryptedSharedPreferences</code> (AES-256-GCM), bukan plain SharedPreferences.</li>
+        <li><strong>HTTPS only</strong> — semua API call via HTTPS, tidak ada plain HTTP.</li>
+        <li><strong>API key public</strong> — anon key memang ada di APK (public by design), keamanan di-enforce via RLS, bukan via hidden key.</li>
+      </ul>
+      <p>Password di-hash oleh Supabase Auth (bcrypt). Tidak ada siapapun (termasuk admin) yang bisa lihat password plain-text user.</p>
+    `
+  },
+  {
+    cat: 'keamanan',
+    q: 'Data apa saja yang dikumpulkan launcher (telemetry)?',
+    a: `
+      <p>Launcher mengirim event telemetry ke Supabase table <code>app_events</code> untuk analitik. Event yang dicatat:</p>
+      <ul>
+        <li><code>app_open</code> — saat launcher dibuka.</li>
+        <li><code>login</code> / <code>logout</code> — sesi auth.</li>
+        <li><code>register</code> — akun baru dibuat.</li>
+        <li><code>patch_apply</code> — patch mod di-apply.</li>
+        <li><code>patch_rollback</code> — patch di-rollback.</li>
+        <li><code>game_launch</code> — game FIFA dibuka dari launcher.</li>
+        <li><code>download_apk</code> — APK di-download (self-update).</li>
+      </ul>
+      <p>Setiap event menyimpan: <code>user_id</code> (yang login), <code>event_type</code>, <code>app_version</code>, <code>created_at</code>. <strong>Tidak ada PII</strong> (Personally Identifiable Information) selain user_id. Tidak ada lokasi GPS, kontak, SMS, atau data pribadi lain.</p>
+    `
+  },
+  {
+    cat: 'keamanan',
+    q: 'Bagaimana cara hapus akun saya permanen?',
+    a: `
+      <p>Penghapusan akun permanen tidak bisa dilakukan langsung dari launcher (untuk keamanan). Hubungi admin via:</p>
+      <ul>
+        <li><a href="https://github.com/drmacze/F16-Launcher/issues/new" target="_blank" rel="noopener">GitHub Issues</a> — buka issue dengan label "account-deletion".</li>
+        <li>Email admin (lihat profil GitHub <a href="https://github.com/drmacze" target="_blank" rel="noopener">@drmacze</a>).</li>
+      </ul>
+      <p>Setelah verifikasi (biasanya 1-2 hari kerja), admin akan:</p>
+      <ul>
+        <li>Hapus row di <code>profiles</code> table.</li>
+        <li>Hapus semua posts, comments, likes, follows.</li>
+        <li>Hapus avatar dari Supabase Storage.</li>
+        <li>Hapus akun dari Supabase Auth (auth.users).</li>
+        <li>Hapus telemetry events terkait user_id (GDPR right to erasure).</li>
+      </ul>
+      <div class="callout">
+        <span class="callout-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="callout-text">Tindakan ini <strong>permanen</strong>. Tidak bisa di-undo. Pastikan kamu benar-benar mau hapus akun.</span>
+      </div>
+    `
+  },
+  {
+    cat: 'keamanan',
+    q: 'Apakah admin bisa lihat password saya?',
+    a: `
+      <p><strong>Tidak.</strong> Password di-hash dengan <strong>bcrypt</strong> oleh Supabase Auth sebelum disimpan. Bahkan admin Supabase pun tidak bisa lihat password plain-text.</p>
+      <p>Saat login, password yang kamu input di-hash lagi lalu dibandingkan dengan hash di database. Tidak ada jalur untuk "recover" password — hanya "reset" via email link.</p>
+      <p>Token access (JWT) disimpan di EncryptedSharedPreferences di HP kamu. Admin tidak bisa akses token tersebut — hanya dari HP kamu sendiri.</p>
+    `
+  },
+  {
+    cat: 'keamanan',
+    q: 'Bagaimana cara lapor bug atau vulnerability?',
+    a: `
+      <p>Untuk bug biasa, buka issue di <a href="https://github.com/drmacze/F16-Launcher/issues/new" target="_blank" rel="noopener">GitHub Issues</a> dengan template:</p>
+      <ul>
+        <li>Launcher version (lihat Settings → About).</li>
+        <li>Android version & device model.</li>
+        <li>Steps to reproduce.</li>
+        <li>Screenshot / screen record (kalau ada).</li>
+        <li>Expected vs actual behavior.</li>
+      </ul>
+      <p>Untuk <strong>security vulnerability</strong> (RCE, SQL injection, auth bypass, dll), <strong>jangan</strong> buka public issue. Kirim email private ke admin (lihat profil GitHub <a href="https://github.com/drmacze" target="_blank" rel="noopener">@drmacze</a>) dengan detail. Responsible disclosure dihargai.</p>
+    `
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER FAQ
+   ═══════════════════════════════════════════════════════════════ */
+const faqList = document.getElementById('faqList');
+const faqEmpty = document.getElementById('faqEmpty');
+const searchInput = document.getElementById('searchInput');
+
+let currentCategory = 'all';
+let currentSearch = '';
+
+function renderFAQ() {
+  const filtered = FAQ_DATA.filter(item => {
+    const matchCat = currentCategory === 'all' || item.cat === currentCategory;
+    const matchSearch = currentSearch === '' ||
+      item.q.toLowerCase().includes(currentSearch) ||
+      item.a.toLowerCase().includes(currentSearch) ||
+      item.cat.toLowerCase().includes(currentSearch);
+    return matchCat && matchSearch;
+  });
+
+  if (filtered.length === 0) {
+    faqList.innerHTML = '';
+    faqEmpty.style.display = 'block';
+    return;
+  }
+
+  faqEmpty.style.display = 'none';
+
+  faqList.innerHTML = filtered.map((item, idx) => `
+    <article class="faq-item reveal" data-cat="${item.cat}" style="--idx:${idx}">
+      <button class="faq-question" aria-expanded="false">
+        <div class="faq-question-text">
+          <span class="faq-question-cat">${categoryLabel(item.cat)}</span>
+          ${item.q}
+        </div>
+        <span class="faq-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-answer">
+        <div class="faq-answer-inner">${item.a}</div>
+      </div>
+    </article>
+  `).join('');
+
+  // Wire accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const btn = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    btn.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(other => {
+        other.classList.remove('open');
+        other.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        other.querySelector('.faq-answer').style.maxHeight = '0';
+      });
+      // Open this one if it was closed
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // Re-init ScrollTrigger for new items
+  if (window.ScrollTrigger) {
+    ScrollTrigger.refresh();
+    // Reveal animations
+    gsap.to('.faq-item.reveal', {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: 'power3.out',
+      stagger: 0.05,
+      scrollTrigger: {
+        trigger: '.faq-section',
+        start: 'top 80%'
+      }
+    });
+  }
+}
+
+function categoryLabel(cat) {
+  const labels = {
+    instalasi: 'Instalasi',
+    akun: 'Akun & Profil',
+    mods: 'Mods & Patch',
+    game: 'Game FIFA',
+    troubleshooting: 'Troubleshooting',
+    keamanan: 'Keamanan'
+  };
+  return labels[cat] || cat;
+}
+
+// Update counts
+function updateCounts() {
+  const counts = { all: FAQ_DATA.length };
+  FAQ_DATA.forEach(item => {
+    counts[item.cat] = (counts[item.cat] || 0) + 1;
+  });
+  Object.entries(counts).forEach(([cat, count]) => {
+    const el = document.getElementById(`count-${cat}`);
+    if (el) el.textContent = count;
+  });
+}
+
+// Category pill clicks
+document.querySelectorAll('.category-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentCategory = pill.dataset.cat;
+    renderFAQ();
+  });
+});
+
+// Search
+searchInput.addEventListener('input', (e) => {
+  currentSearch = e.target.value.toLowerCase().trim();
+  renderFAQ();
+});
+
+updateCounts();
+renderFAQ();
+
+/* ═══════════════════════════════════════════════════════════════
+   HALFTONE CANVAS ANIMATION
+   Cinematic dot pattern that drifts slowly
+   ═══════════════════════════════════════════════════════════════ */
+(function initHalftone() {
+  const canvas = document.getElementById('halftoneCanvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, dpr;
+  let time = 0;
+  let mouseX = 0.5, mouseY = 0.5;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.width = window.innerWidth * dpr;
+    h = canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX / window.innerWidth;
+    mouseY = e.clientY / window.innerHeight;
+  });
+
+  function draw() {
+    time += 0.004;
+
+    // Clear
+    ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+    ctx.fillRect(0, 0, w, h);
+
+    const spacing = 24 * dpr;
+    const cols = Math.ceil(w / spacing) + 1;
+    const rows = Math.ceil(h / spacing) + 1;
+
+    const mx = mouseX * w;
+    const my = mouseY * h;
+
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        const x = i * spacing;
+        const y = j * spacing;
+
+        // Distance from mouse (parallax)
+        const dx = x - mx;
+        const dy = y - my;
+        const distMouse = Math.sqrt(dx * dx + dy * dy);
+        const mouseInfluence = Math.max(0, 1 - distMouse / (400 * dpr));
+
+        // Multi-wave pattern for organic feel
+        const wave1 = Math.sin(time + i * 0.18 + j * 0.12) * 0.5 + 0.5;
+        const wave2 = Math.sin(time * 0.6 + (i + j) * 0.22) * 0.5 + 0.5;
+        const wave3 = Math.cos(time * 0.9 + i * 0.08 - j * 0.15) * 0.5 + 0.5;
+        const combined = wave1 * 0.5 + wave2 * 0.3 + wave3 * 0.2;
+
+        // Dot size — bigger and more dramatic
+        const baseSize = 0.3 * dpr;
+        const maxSize = 4.5 * dpr;
+        const size = baseSize + combined * (maxSize - baseSize) * (1 + mouseInfluence * 1.8);
+
+        // Opacity — higher contrast
+        const opacity = 0.08 + combined * 0.45 + mouseInfluence * 0.5;
+
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.max(0.1, size), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Horizontal scanline drift (cinematic)
+    const scanY = (time * 80 * dpr) % (h + 400 * dpr) - 200 * dpr;
+    const grad = ctx.createLinearGradient(0, scanY - 150 * dpr, 0, scanY + 150 * dpr);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.06)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, scanY - 150 * dpr, w, 300 * dpr);
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   LENIS SMOOTH SCROLL + GSAP INTEGRATION
+   ═══════════════════════════════════════════════════════════════ */
+gsap.registerPlugin(ScrollTrigger);
+
+const lenis = new Lenis({
+  duration: 1.2,
+  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  smoothWheel: true,
+  smoothTouch: false,
+});
+
+lenis.on('scroll', ScrollTrigger.update);
+
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000);
+});
+
+gsap.ticker.lagSmoothing(0);
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO ANIMATIONS — text reveal on load
+   ═══════════════════════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  // Hero title: word-by-word slide up
+  gsap.to('.hero-title .word-inner', {
+    y: '0%',
+    duration: 1.1,
+    ease: 'expo.out',
+    stagger: 0.08,
+    delay: 0.2
+  });
+
+  // Hero badge
+  gsap.from('.hero-badge', {
+    opacity: 0,
+    y: 20,
+    duration: 0.8,
+    ease: 'power3.out',
+    delay: 0.1
+  });
+
+  // Hero subtitle
+  gsap.from('.hero-subtitle', {
+    opacity: 0,
+    y: 20,
+    duration: 0.9,
+    ease: 'power3.out',
+    delay: 0.8
+  });
+
+  // Hero search
+  gsap.from('.hero-search', {
+    opacity: 0,
+    y: 20,
+    duration: 0.9,
+    ease: 'power3.out',
+    delay: 1.0
+  });
+
+  // Hero stats with count-up
+  gsap.from('.hero-stat', {
+    opacity: 0,
+    y: 20,
+    duration: 0.8,
+    ease: 'power3.out',
+    stagger: 0.1,
+    delay: 1.2,
+    onComplete: () => {
+      // Count-up animation
+      document.querySelectorAll('.hero-stat-num').forEach(el => {
+        const target = parseInt(el.dataset.count, 10);
+        gsap.to({ val: 0 }, {
+          val: target,
+          duration: 1.5,
+          ease: 'power2.out',
+          onUpdate: function() {
+            el.textContent = Math.floor(this.targets()[0].val);
+          },
+          onComplete: function() {
+            el.textContent = target;
+          }
+        });
+      });
+    }
+  });
+
+  // Scroll indicator
+  gsap.from('.scroll-indicator', {
+    opacity: 0,
+    duration: 1,
+    delay: 2
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLL-TRIGGERED REVEALS
+   ═══════════════════════════════════════════════════════════════ */
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.to(el, {
+    opacity: 1,
+    y: 0,
+    duration: 0.9,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+      toggleActions: 'play none none none'
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV — scrolled state + mobile menu
+   ═══════════════════════════════════════════════════════════════ */
+const nav = document.getElementById('nav');
+const menuToggle = document.getElementById('menuToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 30) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+});
+
+menuToggle.addEventListener('click', () => {
+  mobileMenu.classList.toggle('open');
+});
+
+document.querySelectorAll('[data-mobile-link]').forEach(link => {
+  link.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV LINK — smooth scroll via Lenis
+   ═══════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const href = link.getAttribute('href');
+    if (href && href.startsWith('#')) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        // Find first FAQ item with this category and scroll to it
+        const cat = href.substring(1);
+        const firstFaq = document.querySelector(`.faq-item[data-cat="${cat}"]`);
+        if (firstFaq) {
+          lenis.scrollTo(firstFaq, { offset: -120, duration: 1.5 });
+          // Also filter by this category
+          document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+          const pill = document.querySelector(`.category-pill[data-cat="${cat}"]`);
+          if (pill) pill.classList.add('active');
+          currentCategory = cat;
+          renderFAQ();
+        } else {
+          lenis.scrollTo(target, { offset: -80, duration: 1.5 });
+        }
+      }
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   PARALLAX on hero (subtle)
+   ═══════════════════════════════════════════════════════════════ */
+gsap.to('.hero-title', {
+  yPercent: 20,
+  opacity: 0.5,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '.hero',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: 1
+  }
+});
+
+gsap.to('.hero-subtitle', {
+  yPercent: 30,
+  opacity: 0,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '.hero',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: 1
+  }
+});
+
+gsap.to('.hero-search', {
+  yPercent: 30,
+  opacity: 0,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '.hero',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: 1
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   CTA title char animation on scroll
+   ═══════════════════════════════════════════════════════════════ */
+gsap.from('.cta-title', {
+  opacity: 0,
+  y: 40,
+  duration: 1,
+  ease: 'power3.out',
+  scrollTrigger: {
+    trigger: '.cta-section',
+    start: 'top 75%'
+  }
+});
+
+gsap.from('.cta-subtitle', {
+  opacity: 0,
+  y: 20,
+  duration: 0.8,
+  ease: 'power3.out',
+  delay: 0.2,
+  scrollTrigger: {
+    trigger: '.cta-section',
+    start: 'top 75%'
+  }
+});
+
+gsap.from('.cta-buttons', {
+  opacity: 0,
+  y: 20,
+  duration: 0.8,
+  ease: 'power3.out',
+  delay: 0.4,
+  scrollTrigger: {
+    trigger: '.cta-section',
+    start: 'top 75%'
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   KEYBOARD: '/' to focus search
+   ═══════════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== searchInput) {
+    e.preventDefault();
+    lenis.scrollTo(searchInput, { offset: -200, duration: 1 });
+    setTimeout(() => searchInput.focus(), 600);
+  }
+  if (e.key === 'Escape' && document.activeElement === searchInput) {
+    searchInput.blur();
+    searchInput.value = '';
+    currentSearch = '';
+    renderFAQ();
+  }
+});
+
+</script>
+
+</body>
+</html>

@@ -326,30 +326,13 @@
     letter-spacing: -0.04em;
     margin-bottom: 24px;
     max-width: 1200px;
-    /* Dynamic color animation — alive, not flat */
-    color: #FFFFFF;
-    animation: hero-color-shift 6s ease-in-out infinite;
-    text-shadow:
-      0 0 40px rgba(255, 255, 255, 0.12),
-      0 0 80px rgba(255, 255, 255, 0.05);
+    color: var(--text-white);
   }
 
   .hero-title .accent {
-    animation: hero-accent-shift 8s ease-in-out infinite;
-    text-shadow: 0 0 30px rgba(255, 255, 255, 0.06);
-  }
-
-  @keyframes hero-color-shift {
-    0%, 100% { color: #FFFFFF; }
-    25% { color: #F0F0F0; }
-    50% { color: #E8E8E8; }
-    75% { color: #F5F5F5; }
-  }
-
-  @keyframes hero-accent-shift {
-    0%, 100% { color: #999999; }
-    33% { color: #BBBBBB; }
-    66% { color: #888888; }
+    font-style: italic;
+    font-weight: 400;
+    color: var(--sub-text);
   }
 
   /* Body text gets subtle dynamic glow */
@@ -357,42 +340,18 @@
     text-shadow: 0 0 24px rgba(0, 0, 0, 0.6);
   }
 
-  .section-title {
-    color: #FFFFFF;
-    animation: section-color-shift 10s ease-in-out infinite;
-  }
-
-  @keyframes section-color-shift {
-    0%, 100% { color: #FFFFFF; }
-    50% { color: #DDDDDD; }
-  }
-
-  .cta-title {
-    color: #FFFFFF;
-    animation: cta-color-shift 8s ease-in-out infinite;
-    text-shadow:
-      0 0 30px rgba(255, 255, 255, 0.08),
-      0 0 60px rgba(255, 255, 255, 0.04);
-  }
-
-  @keyframes cta-color-shift {
-    0%, 100% { color: #FFFFFF; }
-    33% { color: #EEEEEE; }
-    66% { color: #F5F5F5; }
-  }
-
   /* FAQ question text — color shift on hover + open */
   .faq-question {
-    color: #FFFFFF;
+    color: var(--text-white);
     transition: color 0.4s;
   }
 
   .faq-question:hover {
-    color: #DDDDDD;
+    color: var(--soft-text);
   }
 
   .faq-item.open .faq-question {
-    color: #FFFFFF;
+    color: var(--text-white);
   }
 
   .hero-title .word {
@@ -2210,13 +2169,15 @@ document.addEventListener('keydown', (e) => {
 /* ═══════════════════════════════════════════════════════════════
    DOWNLOAD LATEST LAUNCHER
    Fetches latest release from GitHub API → finds APK asset →
-   auto-redirects browser to the asset URL (which triggers download).
-   No GitHub web UI navigation — straight to APK file download.
+   triggers DIRECT file download via hidden <a download> click.
+   No GitHub web UI navigation at all — browser downloads the APK
+   in the background while user stays on the FAQ page.
    ═══════════════════════════════════════════════════════════════ */
 let _latestAssetUrl = null;
+let _latestAssetName = 'DLavie26-Launcher-debug.apk';
 
 async function fetchLatestLauncherUrl() {
-  if (_latestAssetUrl) return _latestAssetUrl;
+  if (_latestAssetUrl) return { url: _latestAssetUrl, name: _latestAssetName };
   try {
     const resp = await fetch('https://api.github.com/repos/drmacze/F16-Launcher/releases/latest', {
       headers: { 'Accept': 'application/vnd.github+json' }
@@ -2229,11 +2190,14 @@ async function fetchLatestLauncherUrl() {
       throw new Error('No APK asset in latest release');
     }
     _latestAssetUrl = apk.browser_download_url;
-    return _latestAssetUrl;
+    _latestAssetName = apk.name;
+    return { url: _latestAssetUrl, name: _latestAssetName };
   } catch (err) {
     console.warn('GitHub API fetch failed, falling back to latest/download pattern:', err);
     // Fallback: GitHub's "latest/download" shortcut (works if asset name is consistent)
-    return 'https://github.com/drmacze/F16-Launcher/releases/latest/download/DLavie26-Launcher-debug.apk';
+    const fallbackUrl = 'https://github.com/drmacze/F16-Launcher/releases/latest/download/DLavie26-Launcher-debug.apk';
+    _latestAssetUrl = fallbackUrl;
+    return { url: fallbackUrl, name: 'DLavie26-Launcher-debug.apk' };
   }
 }
 
@@ -2245,21 +2209,27 @@ async function downloadLatestLauncher(event) {
     original[i] = el.textContent;
     el.textContent = 'Memuat…';
   });
-
-  // Add loading state to body
   document.body.style.cursor = 'wait';
 
   try {
-    const url = await fetchLatestLauncherUrl();
-    // Trigger download by navigating browser to the asset URL.
-    // GitHub will 302-redirect to the actual blob storage, which forces
-    // the browser to download the file (not navigate to a page).
-    window.location.href = url;
+    const { url, name } = await fetchLatestLauncherUrl();
+
+    // Use hidden <a download> click — this tells the browser to download
+    // the file directly without navigating away from the current page.
+    // Cross-origin works because GitHub sets Content-Disposition: attachment.
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;          // hint filename
+    a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    // Cleanup after click dispatched
+    setTimeout(() => document.body.removeChild(a), 1000);
   } catch (err) {
     alert('Gagal mengambil URL download. Coba buka https://github.com/drmacze/F16-Launcher/releases/latest secara manual.');
     console.error(err);
   } finally {
-    // Reset button text after 3 seconds (in case user comes back)
     setTimeout(() => {
       btnTexts.forEach((el, i) => { el.textContent = original[i]; });
       document.body.style.cursor = '';

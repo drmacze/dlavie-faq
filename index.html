@@ -1101,6 +1101,583 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
+     MODAL OVERLAY (auth + create issue)
+     ═══════════════════════════════════════════════════════════════ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-card {
+    background: var(--surface-1);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-xl);
+    max-width: 480px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.3s var(--ease-out-expo);
+  }
+
+  .modal-overlay.open .modal-card {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--sub-text);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    color: var(--text-white);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .modal-close svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .modal-subtitle {
+    color: var(--soft-text);
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* Auth form */
+  .auth-form-group {
+    margin-bottom: 16px;
+  }
+
+  .auth-label {
+    display: block;
+    font-size: 12px;
+    color: var(--sub-text);
+    font-weight: 600;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .auth-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    color: var(--text-white);
+    font-family: var(--font-body);
+    font-size: 15px;
+    transition: border-color 0.3s;
+  }
+
+  .auth-input:focus {
+    outline: none;
+    border-color: var(--glass-stroke-hi);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .auth-input::placeholder {
+    color: var(--dim-text);
+  }
+
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--dim-text);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .auth-divider::before,
+  .auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--hairline);
+  }
+
+  .btn-connect-dlavie {
+    width: 100%;
+    background: var(--text-white);
+    color: var(--pure-black);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 14px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn-connect-dlavie:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-connect-dlavie svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--sub-text);
+  }
+
+  .auth-switch a {
+    color: var(--text-white);
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid var(--glass-stroke);
+  }
+
+  .auth-error {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(255,68,68,0.08);
+    border: 1px solid rgba(255,68,68,0.25);
+    border-radius: var(--radius-sm);
+    display: none;
+  }
+
+  .auth-error.show {
+    display: block;
+  }
+
+  /* Account selector (Vercel-style) */
+  .account-selector {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .account-selector-label {
+    font-size: 12px;
+    color: var(--sub-text);
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .account-selector-button {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    color: var(--text-white);
+    font-family: var(--font-body);
+  }
+
+  .account-selector-button:hover {
+    border-color: var(--glass-stroke-hi);
+  }
+
+  .account-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-stroke);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-white);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .account-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .account-info {
+    flex: 1;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .account-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .account-username {
+    font-size: 12px;
+    color: var(--sub-text);
+  }
+
+  .account-selector-chevron {
+    color: var(--sub-text);
+    flex-shrink: 0;
+  }
+
+  /* Category radio (Vercel-style) */
+  .category-radios {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .category-radio {
+    flex: 1;
+    min-width: 100px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--soft-text);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .category-radio:hover {
+    border-color: var(--glass-stroke-hi);
+  }
+
+  .category-radio.selected {
+    background: var(--text-white);
+    color: var(--pure-black);
+    border-color: var(--text-white);
+  }
+
+  .category-radio-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--sub-text);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .category-radio.selected .category-radio-dot {
+    border-color: var(--pure-black);
+    background: var(--pure-black);
+    box-shadow: inset 0 0 0 3px var(--text-white);
+  }
+
+  /* Issue form fields */
+  .issue-form-group {
+    margin-bottom: 16px;
+  }
+
+  .issue-input,
+  .issue-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    color: var(--text-white);
+    font-family: var(--font-body);
+    font-size: 15px;
+    transition: border-color 0.3s;
+    resize: vertical;
+  }
+
+  .issue-input:focus,
+  .issue-textarea:focus {
+    outline: none;
+    border-color: var(--glass-stroke-hi);
+    background: rgba(255,255,255,0.06);
+  }
+
+  .issue-textarea {
+    min-height: 100px;
+    font-family: var(--font-body);
+    line-height: 1.5;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     ISSUES PAGE
+     ═══════════════════════════════════════════════════════════════ */
+  .issues-section {
+    padding: 80px 32px 120px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .issue-card {
+    background: var(--surface-1);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    transition: border-color 0.3s;
+  }
+
+  .issue-card:hover {
+    border-color: var(--glass-stroke-hi);
+  }
+
+  .issue-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .issue-card-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-stroke);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .issue-card-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .issue-card-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .issue-card-author {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-white);
+  }
+
+  .issue-card-time {
+    font-size: 12px;
+    color: var(--sub-text);
+    font-family: var(--font-mono);
+  }
+
+  .issue-card-category {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .issue-card-category.bug { background: rgba(255,68,68,0.15); color: #FF6B6B; }
+  .issue-card-category.feature { background: rgba(0,210,106,0.15); color: #00D26A; }
+  .issue-card-category.question { background: rgba(255,170,0,0.15); color: #FFAA00; }
+  .issue-card-category.other { background: rgba(136,136,136,0.15); color: #AAA; }
+
+  .issue-card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .issue-card-body {
+    color: var(--soft-text);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+  }
+
+  .issue-card-reply {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--text-white);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .issue-card-reply-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .issue-card-reply-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: var(--text-white);
+    color: var(--pure-black);
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .issue-card-reply-text {
+    color: var(--soft-text);
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .issue-card-id {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--dim-text);
+    letter-spacing: 0.04em;
+  }
+
+  .issues-empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--sub-text);
+  }
+
+  .issues-empty-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--text-white);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  /* User badge in nav */
+  .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--glass-stroke);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-user:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .nav-user-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    overflow: hidden;
+  }
+
+  .nav-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nav-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-white);
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 768px) {
+    .nav-user-name {
+      display: none;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
      REDUCED MOTION
      ═══════════════════════════════════════════════════════════════ */
   @media (prefers-reduced-motion: reduce) {
@@ -1139,6 +1716,7 @@
   <ul class="nav-links">
     <li><a class="nav-link" href="#instalasi">Instalasi</a></li>
     <li><a class="nav-link" href="#akun">Akun</a></li>
+    <li><a class="nav-link" href="#issues">Issue</a></li>
     <li><a class="nav-link" href="#mods">Mods</a></li>
     <li><a class="nav-link" href="#game">Game</a></li>
     <li><a class="nav-link" href="#troubleshooting">Troubleshooting</a></li>
@@ -1161,6 +1739,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="#instalasi" data-mobile-link>Instalasi</a>
   <a href="#akun" data-mobile-link>Akun</a>
+  <a href="#issues" data-mobile-link>Issue</a>
   <a href="#mods" data-mobile-link>Mods</a>
   <a href="#game" data-mobile-link>Game</a>
   <a href="#troubleshooting" data-mobile-link>Troubleshooting</a>
@@ -1291,9 +1870,9 @@
     Gabung Discord atau buat issue di GitHub. Tim dan komunitas akan bantu.
   </p>
   <div class="cta-buttons reveal">
-    <a href="https://github.com/drmacze/F16-Launcher/issues/new" target="_blank" rel="noopener" class="btn-primary">
+    <a href="#" class="btn-primary" onclick="openCreateIssueFlow(event)">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
-      Buka Issue
+      Buat Issue
     </a>
     <a href="https://github.com/drmacze/F16-Launcher" target="_blank" rel="noopener" class="btn-secondary">
       Lihat Repo
@@ -1301,6 +1880,164 @@
     </a>
   </div>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     ISSUES PAGE — semua issue dari komunitas
+     ═══════════════════════════════════════════════════════════════ -->
+<section class="issues-section" id="issues">
+  <div class="section-label reveal">Issues Komunitas</div>
+  <h2 class="section-title reveal">Lihat semua issue dari user DLavie.</h2>
+  <p class="hero-subtitle reveal" style="margin-bottom:32px;">
+    Transparansi penuh — semua issue yang dilaporkan user tampil di sini.
+    Tim DLavie akan mereview setiap issue dan memberikan update.
+  </p>
+  <div id="issuesList" class="issues-list">
+    <div class="issues-empty">
+      <div class="issues-empty-title">Memuat issues…</div>
+      <p>Sedang mengambil data dari server.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     AUTH MODAL (Login / Register)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title" id="authModalTitle">Masuk ke DLavie</div>
+      <button class="modal-close" onclick="closeAuthModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p class="modal-subtitle" id="authModalSubtitle">
+      Login dengan akun DLavie Launcher untuk membuat issue.
+    </p>
+
+    <!-- Connect to DLavie (deep link) -->
+    <button class="btn-connect-dlavie" onclick="connectToDLavie()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+      Connect to DLavie
+    </button>
+
+    <div class="auth-divider">atau login manual</div>
+
+    <!-- Login form -->
+    <div id="loginForm">
+      <div class="auth-form-group">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="loginEmail" placeholder="kamu@email.com" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Password</label>
+        <input type="password" class="auth-input" id="loginPassword" placeholder="••••••••" />
+      </div>
+      <div class="auth-error" id="loginError"></div>
+      <button class="btn-connect-dlavie" onclick="performLogin()" style="margin-top:8px;">
+        Masuk
+      </button>
+    </div>
+
+    <!-- Register form (hidden by default) -->
+    <div id="registerForm" style="display:none;">
+      <div class="auth-form-group">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="regEmail" placeholder="kamu@email.com" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Password</label>
+        <input type="password" class="auth-input" id="regPassword" placeholder="Min 6 karakter" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Username</label>
+        <input type="text" class="auth-input" id="regUsername" placeholder="3-24 huruf/angka/_" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-label">Display Name</label>
+        <input type="text" class="auth-input" id="regDisplayName" placeholder="Nama tampilan" />
+      </div>
+      <div class="auth-error" id="regError"></div>
+      <button class="btn-connect-dlavie" onclick="performRegister()" style="margin-top:8px;">
+        Daftar
+      </button>
+    </div>
+
+    <div class="auth-switch" id="authSwitch">
+      Belum punya akun? <a onclick="switchAuthMode('register')">Daftar di sini</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CREATE ISSUE MODAL (Vercel-style)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="createIssueModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div class="modal-title">Buat Issue</div>
+      <button class="modal-close" onclick="closeCreateIssueModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p class="modal-subtitle">
+      Laporan Anda akan tampil di halaman Issue untuk semua user DLavie.
+    </p>
+
+    <!-- Account selector (auto-filled from logged-in user) -->
+    <div class="account-selector">
+      <div class="account-selector-label">Akun</div>
+      <div class="account-selector-button" id="accountSelectorBtn">
+        <div class="account-avatar" id="accountAvatar"></div>
+        <div class="account-info">
+          <div class="account-name" id="accountName">—</div>
+          <div class="account-username" id="accountUsername">—</div>
+        </div>
+        <div class="account-selector-chevron">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category radio buttons (Vercel-style) -->
+    <div class="account-selector-label">Kategori</div>
+    <div class="category-radios" id="categoryRadios">
+      <div class="category-radio selected" data-cat="Bug" onclick="selectCategory(this)">
+        <div class="category-radio-dot"></div>
+        Bug
+      </div>
+      <div class="category-radio" data-cat="Feature" onclick="selectCategory(this)">
+        <div class="category-radio-dot"></div>
+        Feature
+      </div>
+      <div class="category-radio" data-cat="Question" onclick="selectCategory(this)">
+        <div class="category-radio-dot"></div>
+        Question
+      </div>
+      <div class="category-radio" data-cat="Other" onclick="selectCategory(this)">
+        <div class="category-radio-dot"></div>
+        Other
+      </div>
+    </div>
+
+    <!-- Issue title -->
+    <div class="issue-form-group">
+      <label class="auth-label">Judul Issue</label>
+      <input type="text" class="issue-input" id="issueTitle" placeholder="Ringkasan singkat issue Anda" />
+    </div>
+
+    <!-- Issue body -->
+    <div class="issue-form-group">
+      <label class="auth-label">Detail Issue</label>
+      <textarea class="issue-textarea" id="issueBody" placeholder="Jelaskan issue secara detail…"></textarea>
+    </div>
+
+    <div class="auth-error" id="issueError"></div>
+
+    <button class="btn-connect-dlavie" onclick="submitIssue()" style="margin-top:8px;">
+      Kirim Issue
+    </button>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════
      FOOTER
@@ -2370,6 +3107,676 @@ function downloadLatestLauncher(event) {
     }, 3000);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ISSUE SYSTEM — Auth + Create Issue + Issues List + Auto-Reply
+   ═══════════════════════════════════════════════════════════════ */
+
+const SUPABASE_URL = 'https://lvmucsxbmadtsgrxuwmo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2bXVjc3hibWFkdHNncnh1d21vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5ODUyODksImV4cCI6MjA5ODU2MTI4OX0.y-1sE6uYTn4Wbter6g6NozY6uojzD5x9YVeYif-5nJs';
+
+// Session state
+let currentUser = null;   // { id, email, username, display_name, avatar_url }
+let selectedCategory = 'Bug';
+
+// ─── Session management ───
+function saveSession(access, refresh, userId, email) {
+  localStorage.setItem('dlavie_access', access);
+  localStorage.setItem('dlavie_refresh', refresh);
+  localStorage.setItem('dlavie_uid', userId);
+  localStorage.setItem('dlavie_email', email || '');
+}
+
+function clearSession() {
+  localStorage.removeItem('dlavie_access');
+  localStorage.removeItem('dlavie_refresh');
+  localStorage.removeItem('dlavie_uid');
+  localStorage.removeItem('dlavie_email');
+  currentUser = null;
+}
+
+function getStoredSession() {
+  const access = localStorage.getItem('dlavie_access');
+  const uid = localStorage.getItem('dlavie_uid');
+  if (!access || !uid) return null;
+  return { access, uid };
+}
+
+// ─── Fetch user profile from Supabase ───
+async function fetchUserProfile(uid, accessToken) {
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${uid}&select=id,username,display_name,avatar_url,role&limit=1`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data[0] || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// ─── Auto-restore session on page load ───
+async function restoreSession() {
+  const session = getStoredSession();
+  if (!session) return;
+  const profile = await fetchUserProfile(session.uid, session.access);
+  if (profile) {
+    currentUser = {
+      id: profile.id,
+      email: localStorage.getItem('dlavie_email') || '',
+      username: profile.username,
+      display_name: profile.display_name,
+      avatar_url: profile.avatar_url,
+      role: profile.role
+    };
+    updateNavUser();
+  } else {
+    clearSession();
+  }
+}
+
+// ─── Update nav bar with user info ───
+function updateNavUser() {
+  const navCta = document.getElementById('downloadBtn');
+  if (!navCta) return;
+  // Check if user badge already exists
+  let userBadge = document.getElementById('navUserBadge');
+  if (currentUser) {
+    if (!userBadge) {
+      userBadge = document.createElement('div');
+      userBadge.id = 'navUserBadge';
+      userBadge.className = 'nav-user';
+      userBadge.onclick = () => logout();
+      userBadge.title = 'Klik untuk logout';
+      navCta.parentNode.insertBefore(userBadge, navCta);
+    }
+    const initial = (currentUser.display_name || currentUser.username || '?')[0].toUpperCase();
+    const avatarHtml = currentUser.avatar_url
+      ? `<img src="${currentUser.avatar_url}" alt="" />`
+      : initial;
+    userBadge.innerHTML = `
+      <div class="nav-user-avatar">${avatarHtml}</div>
+      <span class="nav-user-name">${escapeHtml(currentUser.display_name || currentUser.username)}</span>
+    `;
+  } else {
+    if (userBadge) userBadge.remove();
+  }
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s || '';
+  return div.innerHTML;
+}
+
+// ─── Auth modal ───
+function openAuthModal() {
+  document.getElementById('authModal').classList.add('open');
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function switchAuthMode(mode) {
+  const loginForm = document.getElementById('loginForm');
+  const regForm = document.getElementById('registerForm');
+  const title = document.getElementById('authModalTitle');
+  const subtitle = document.getElementById('authModalSubtitle');
+  const switchText = document.getElementById('authSwitch');
+
+  if (mode === 'register') {
+    loginForm.style.display = 'none';
+    regForm.style.display = 'block';
+    title.textContent = 'Daftar Akun DLavie';
+    subtitle.textContent = 'Buat akun baru untuk membuat issue dan berinteraksi dengan komunitas.';
+    switchText.innerHTML = 'Sudah punya akun? <a onclick="switchAuthMode(\'login\')">Masuk di sini</a>';
+  } else {
+    loginForm.style.display = 'block';
+    regForm.style.display = 'none';
+    title.textContent = 'Masuk ke DLavie';
+    subtitle.textContent = 'Login dengan akun DLavie Launcher untuk membuat issue.';
+    switchText.innerHTML = 'Belum punya akun? <a onclick="switchAuthMode(\'register\')">Daftar di sini</a>';
+  }
+}
+
+// ─── Connect to DLavie (deep link) ───
+function connectToDLavie() {
+  // Try to open the launcher app via deep link
+  // The launcher should handle dlavie://connect and redirect back with auth token
+  const callbackUrl = encodeURIComponent(window.location.href);
+  const deepLink = `dlavie://connect?callback=${callbackUrl}`;
+
+  // Attempt to open the deep link
+  window.location.href = deepLink;
+
+  // Fallback: if the app didn't open (user stays on page), show a hint after 2s
+  setTimeout(() => {
+    const errEl = document.getElementById('loginError');
+    errEl.textContent = 'Launcher tidak terdeteksi. Silakan login manual dengan email & password di bawah.';
+    errEl.classList.add('show');
+  }, 2500);
+}
+
+// ─── Login ───
+async function performLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+
+  if (!email || !password) {
+    errEl.textContent = 'Email dan password wajib diisi.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) {
+      throw new Error(data.error_description || data.error || data.msg || 'Login gagal');
+    }
+
+    saveSession(data.access_token, data.refresh_token, data.user.id, data.user.email);
+
+    // Fetch profile
+    const profile = await fetchUserProfile(data.user.id, data.access_token);
+    if (profile) {
+      currentUser = {
+        id: profile.id,
+        email: data.user.email,
+        username: profile.username,
+        display_name: profile.display_name,
+        avatar_url: profile.avatar_url,
+        role: profile.role
+      };
+    }
+
+    closeAuthModal();
+    updateNavUser();
+
+    // If we were trying to create an issue, open the issue modal now
+    if (window._pendingIssueCreation) {
+      window._pendingIssueCreation = false;
+      openCreateIssueModal();
+    }
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('show');
+  }
+}
+
+// ─── Register ───
+async function performRegister() {
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const username = document.getElementById('regUsername').value.trim();
+  const displayName = document.getElementById('regDisplayName').value.trim();
+  const errEl = document.getElementById('regError');
+  errEl.classList.remove('show');
+
+  if (!email || !password || !username || !displayName) {
+    errEl.textContent = 'Semua field wajib diisi.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (password.length < 6) {
+    errEl.textContent = 'Password minimal 6 karakter.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (!username.match(/^[a-zA-Z0-9_]{3,24}$/)) {
+    errEl.textContent = 'Username harus 3-24 karakter (huruf, angka, underscore).';
+    errEl.classList.add('show');
+    return;
+  }
+
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        data: { username, display_name: displayName }
+      })
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) {
+      throw new Error(data.error_description || data.error || data.msg || 'Registrasi gagal');
+    }
+
+    // After signup, try to insert profile row
+    if (data.user) {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${data.access_token}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            id: data.user.id,
+            username: username,
+            display_name: displayName,
+            role: 'user'
+          })
+        });
+      } catch (e) {
+        // Profile row might be auto-created by trigger — ignore error
+      }
+    }
+
+    if (data.access_token) {
+      // Auto-login after register
+      saveSession(data.access_token, data.refresh_token, data.user.id, data.user.email);
+      const profile = await fetchUserProfile(data.user.id, data.access_token);
+      if (profile) {
+        currentUser = {
+          id: profile.id,
+          email: data.user.email,
+          username: profile.username,
+          display_name: profile.display_name,
+          avatar_url: profile.avatar_url,
+          role: profile.role
+        };
+      } else {
+        currentUser = {
+          id: data.user.id,
+          email: data.user.email,
+          username: username,
+          display_name: displayName,
+          avatar_url: null,
+          role: 'user'
+        };
+      }
+      closeAuthModal();
+      updateNavUser();
+      if (window._pendingIssueCreation) {
+        window._pendingIssueCreation = false;
+        openCreateIssueModal();
+      }
+    } else {
+      // Email confirmation required
+      errEl.textContent = 'Registrasi berhasil! Cek email untuk konfirmasi, lalu login.';
+      errEl.style.color = 'var(--success)';
+      errEl.style.background = 'rgba(0,210,106,0.08)';
+      errEl.style.borderColor = 'rgba(0,210,106,0.25)';
+      errEl.classList.add('show');
+    }
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('show');
+  }
+}
+
+// ─── Logout ───
+function logout() {
+  clearSession();
+  updateNavUser();
+}
+
+// ─── Create Issue flow ───
+function openCreateIssueFlow(event) {
+  if (event) event.preventDefault();
+  if (!currentUser) {
+    // Need to login first
+    window._pendingIssueCreation = true;
+    openAuthModal();
+  } else {
+    openCreateIssueModal();
+  }
+}
+
+function openCreateIssueModal() {
+  // Pre-fill account info
+  document.getElementById('accountName').textContent = currentUser.display_name || currentUser.username;
+  document.getElementById('accountUsername').textContent = '@' + (currentUser.username || '—');
+  const avatarEl = document.getElementById('accountAvatar');
+  if (currentUser.avatar_url) {
+    avatarEl.innerHTML = `<img src="${currentUser.avatar_url}" alt="" />`;
+  } else {
+    avatarEl.textContent = (currentUser.display_name || currentUser.username || '?')[0].toUpperCase();
+  }
+
+  // Reset form
+  document.getElementById('issueTitle').value = '';
+  document.getElementById('issueBody').value = '';
+  document.getElementById('issueError').classList.remove('show');
+  selectedCategory = 'Bug';
+  document.querySelectorAll('.category-radio').forEach(r => {
+    r.classList.toggle('selected', r.dataset.cat === 'Bug');
+  });
+
+  document.getElementById('createIssueModal').classList.add('open');
+}
+
+function closeCreateIssueModal() {
+  document.getElementById('createIssueModal').classList.remove('open');
+}
+
+function selectCategory(el) {
+  document.querySelectorAll('.category-radio').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCategory = el.dataset.cat;
+}
+
+// ─── Generate auto-reply text ───
+function generateAutoReply(userName, issueTitle, issueId) {
+  const date = new Date().toLocaleDateString('id-ID', {
+    year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  return `Terima kasih ${userName} atas laporan Anda mengenai "${issueTitle}".
+
+Tim DLavie telah menerima issue Anda dan akan mereview dalam 1-2 hari kerja. Kami berkomitmen untuk mengevaluasi setiap laporan secara serius dan akan memberikan update melalui issue ini secepatnya.
+
+Jika issue ini bersifat urgent (crash, data loss, security), tim kami akan memprioritaskan penanganan. Untuk pertanyaan atau diskusi lebih lanjut, Anda dapat membalas thread ini.
+
+Salam hangat,
+Tim DLavie
+
+───────────────────
+Issue ID: ${issueId}
+Dibuat: ${date}
+Status: Open`;
+}
+
+// ─── Submit issue ───
+async function submitIssue() {
+  const title = document.getElementById('issueTitle').value.trim();
+  const body = document.getElementById('issueBody').value.trim();
+  const errEl = document.getElementById('issueError');
+  errEl.classList.remove('show');
+
+  if (!title || !body) {
+    errEl.textContent = 'Judul dan detail issue wajib diisi.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (title.length < 5) {
+    errEl.textContent = 'Judul minimal 5 karakter.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  try {
+    // Insert into feed_posts with type='issue'
+    const postBody = `[${selectedCategory}]\n${body}`;
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/feed_posts`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${localStorage.getItem('dlavie_access')}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({
+        title: title,
+        body: postBody,
+        type: 'issue',
+        author_id: currentUser.id,
+        visibility: 'public',
+        pinned: false,
+        official: false,
+        is_draft: false
+      })
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) {
+      throw new Error(data.message || 'Gagal membuat issue');
+    }
+
+    const issueId = data[0].id;
+    const shortId = issueId.substring(0, 8);
+
+    // Generate and insert auto-reply as a comment
+    const autoReply = generateAutoReply(
+      currentUser.display_name || currentUser.username,
+      title,
+      shortId
+    );
+
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/feed_comments`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${localStorage.getItem('dlavie_access')}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          post_id: issueId,
+          user_id: currentUser.id,
+          body: autoReply
+        })
+      });
+    } catch (e) {
+      // Auto-reply insert failed — issue still created
+      console.warn('Auto-reply insert failed:', e);
+    }
+
+    closeCreateIssueModal();
+
+    // Scroll to issues page + refresh list
+    const issuesSection = document.getElementById('issues');
+    if (issuesSection && lenis) {
+      lenis.scrollTo(issuesSection, { offset: -80, duration: 1 });
+    }
+    loadIssues();
+
+    // Show success toast
+    showToast('Issue berhasil dibuat! Auto-reply telah dikirim.');
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.add('show');
+  }
+}
+
+// ─── Toast notification ───
+function showToast(msg) {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.style.cssText = `
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--text-white); color: var(--pure-black);
+      padding: 14px 24px; border-radius: 999px; font-size: 14px;
+      font-weight: 600; z-index: 300; opacity: 0;
+      transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+      box-shadow: 0 10px 40px rgba(255,255,255,0.2);
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(10px)';
+  }, 3500);
+}
+
+// ─── Load issues from Supabase ───
+async function loadIssues() {
+  const listEl = document.getElementById('issuesList');
+  if (!listEl) return;
+
+  try {
+    // Fetch issues (feed_posts with type=issue), joined with author profile
+    const resp = await fetch(
+      `${SUPABASE_URL}/rest/v1/feed_posts?type=eq.issue&order=created_at.desc&limit=50&select=id,title,body,author_id,created_at,author:profiles!feed_posts_author_id_fkey(username,display_name,avatar_url)`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY } }
+    );
+
+    if (!resp.ok) throw new Error('Failed to load issues');
+    const issues = await resp.json();
+
+    // Fetch comments (auto-replies) for all issues
+    let commentsMap = {};
+    if (issues.length > 0) {
+      const issueIds = issues.map(i => i.id).join(',');
+      const cResp = await fetch(
+        `${SUPABASE_URL}/rest/v1/feed_comments?post_id=in.(${issueIds})&order=created_at.asc&select=post_id,body,created_at`,
+        { headers: { 'apikey': SUPABASE_ANON_KEY } }
+      );
+      if (cResp.ok) {
+        const comments = await cResp.json();
+        comments.forEach(c => {
+          if (!commentsMap[c.post_id]) commentsMap[c.post_id] = [];
+          commentsMap[c.post_id].push(c);
+        });
+      }
+    }
+
+    if (issues.length === 0) {
+      listEl.innerHTML = `
+        <div class="issues-empty">
+          <div class="issues-empty-title">Belum ada issue</div>
+          <p>Jadilah yang pertama melaporkan issue. Klik "Buat Issue" di bawah.</p>
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = issues.map(issue => {
+      const author = issue.author || {};
+      const authorName = author.display_name || author.username || 'Anonymous';
+      const authorInitial = (authorName[0] || '?').toUpperCase();
+      const avatarHtml = author.avatar_url
+        ? `<img src="${author.avatar_url}" alt="" />`
+        : authorInitial;
+      const shortId = issue.id.substring(0, 8);
+
+      // Parse category from body (format: [Category]\nbody)
+      let category = 'Other';
+      let bodyText = issue.body || '';
+      const catMatch = bodyText.match(/^\[(\w+)\]\n/);
+      if (catMatch) {
+        category = catMatch[1];
+        bodyText = bodyText.replace(/^\[\w+\]\n/, '');
+      }
+
+      const catClass = category.toLowerCase().replace(/[^a-z]/g, '');
+
+      // Format time
+      const time = new Date(issue.created_at).toLocaleDateString('id-ID', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      // Get auto-reply
+      const comments = commentsMap[issue.id] || [];
+      const replyHtml = comments.length > 0
+        ? `
+          <div class="issue-card-reply">
+            <div class="issue-card-reply-header">
+              <span class="issue-card-reply-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+                Auto-Reply
+              </span>
+            </div>
+            <div class="issue-card-reply-text">${escapeHtml(comments[0].body)}</div>
+          </div>
+        `
+        : '';
+
+      return `
+        <article class="issue-card reveal">
+          <div class="issue-card-header">
+            <div class="issue-card-avatar">${avatarHtml}</div>
+            <div class="issue-card-meta">
+              <div class="issue-card-author">${escapeHtml(authorName)}</div>
+              <div class="issue-card-time">${time}</div>
+            </div>
+          </div>
+          <div class="issue-card-category ${catClass}">${escapeHtml(category)}</div>
+          <h3 class="issue-card-title">${escapeHtml(issue.title)}</h3>
+          <div class="issue-card-body">${escapeHtml(bodyText)}</div>
+          ${replyHtml}
+          <div class="issue-card-id">Issue ID: ${shortId} · ${issue.id}</div>
+        </article>
+      `;
+    }).join('');
+
+    // Re-trigger reveal animations
+    if (window.ScrollTrigger) {
+      ScrollTrigger.refresh();
+      gsap.to('#issuesList .issue-card', {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: 'power3.out',
+        stagger: 0.08,
+        scrollTrigger: { trigger: '#issuesList', start: 'top 85%' }
+      });
+    }
+  } catch (err) {
+    listEl.innerHTML = `
+      <div class="issues-empty">
+        <div class="issues-empty-title">Gagal memuat issues</div>
+        <p>${escapeHtml(err.message)}. Coba refresh halaman.</p>
+      </div>
+    `;
+  }
+}
+
+// ─── Nav link "Issue" click → scroll to issues section + load ───
+document.querySelectorAll('a[href="#issues"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.getElementById('issues');
+    if (target && lenis) {
+      lenis.scrollTo(target, { offset: -80, duration: 1.5 });
+    }
+    loadIssues();
+  });
+});
+
+// ─── Close modal on overlay click ───
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('open');
+    }
+  });
+});
+
+// ─── Close modal on Escape ───
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+// ─── Init: restore session + load issues on page load ───
+restoreSession().then(() => {
+  // Load issues after session restore (so we know if user is logged in)
+  loadIssues();
+});
 
 </script>
 

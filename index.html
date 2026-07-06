@@ -1687,6 +1687,103 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
+     USER DROPDOWN MENU
+     ═══════════════════════════════════════════════════════════════ */
+  .user-menu {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background: var(--surface-1);
+    border: 1px solid var(--glass-stroke-hi);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    min-width: 240px;
+    z-index: 150;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    backdrop-filter: blur(20px);
+  }
+
+  .user-menu.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .user-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px;
+  }
+
+  .user-menu-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--glass-stroke);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .user-menu-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  .user-menu-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-white);
+  }
+
+  .user-menu-email {
+    font-size: 12px;
+    color: var(--sub-text);
+    font-family: var(--font-mono);
+  }
+
+  .user-menu-divider {
+    height: 1px;
+    background: var(--hairline);
+    margin: 12px 0;
+  }
+
+  .user-menu-item {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--soft-text);
+    padding: 10px 8px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .user-menu-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-white);
+  }
+
+  .user-menu-item:last-child:hover {
+    color: var(--danger);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
      REDUCED MOTION
      ═══════════════════════════════════════════════════════════════ */
   @media (prefers-reduced-motion: reduce) {
@@ -3199,9 +3296,14 @@ function updateNavUser() {
       userBadge = document.createElement('div');
       userBadge.id = 'navUserBadge';
       userBadge.className = 'nav-user';
-      userBadge.onclick = () => logout();
-      userBadge.title = 'Klik untuk logout';
+      userBadge.title = 'Klik untuk melihat opsi';
       navCta.parentNode.insertBefore(userBadge, navCta);
+
+      // Click → toggle dropdown (NOT logout)
+      userBadge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleUserMenu();
+      });
     }
     const initial = (currentUser.display_name || currentUser.username || '?')[0].toUpperCase();
     const avatarHtml = currentUser.avatar_url
@@ -3213,6 +3315,56 @@ function updateNavUser() {
     `;
   } else {
     if (userBadge) userBadge.remove();
+    closeUserMenu();
+  }
+}
+
+// ─── User dropdown menu (Profile + Logout) ───
+function toggleUserMenu() {
+  let menu = document.getElementById('userMenu');
+  if (menu) {
+    menu.classList.toggle('open');
+    return;
+  }
+
+  // Create dropdown menu
+  menu = document.createElement('div');
+  menu.id = 'userMenu';
+  menu.className = 'user-menu';
+  menu.innerHTML = `
+    <div class="user-menu-header">
+      <div class="user-menu-avatar">${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="" />` : (currentUser.display_name || currentUser.username || '?')[0].toUpperCase()}</div>
+      <div>
+        <div class="user-menu-name">${escapeHtml(currentUser.display_name || currentUser.username)}</div>
+        <div class="user-menu-email">${escapeHtml(currentUser.email || '@' + (currentUser.username || ''))}</div>
+      </div>
+    </div>
+    <div class="user-menu-divider"></div>
+    <button class="user-menu-item" onclick="closeUserMenu(); logout();">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  `;
+  document.body.appendChild(menu);
+  menu.classList.add('open');
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', closeUserMenuOnOutside);
+  }, 0);
+}
+
+function closeUserMenu() {
+  const menu = document.getElementById('userMenu');
+  if (menu) menu.classList.remove('open');
+  document.removeEventListener('click', closeUserMenuOnOutside);
+}
+
+function closeUserMenuOnOutside(e) {
+  const menu = document.getElementById('userMenu');
+  const badge = document.getElementById('navUserBadge');
+  if (menu && !menu.contains(e.target) && (!badge || !badge.contains(e.target))) {
+    closeUserMenu();
   }
 }
 

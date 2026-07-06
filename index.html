@@ -3897,16 +3897,35 @@ function selectCategory(el) {
   selectedCategory = el.dataset.cat;
 }
 
-// ─── Generate auto-reply text ───
+// ─── Smart auto-reply — analyzes keywords in title + body ───
 function generateAutoReply(userName, issueTitle, issueId, issueBody, category) {
   const date = new Date().toLocaleDateString('id-ID', {
     year: 'numeric', month: 'long', day: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
 
+  const text = (issueTitle + ' ' + (issueBody || '')).toLowerCase();
+  let contextualNote = '';
+
+  if (text.match(/crash|force close|fc|tutup sendiri|keluar sendiri/)) {
+    contextualNote = '\nKami mendeteksi issue ini berkaitan dengan crash/force close. Untuk membantu investigasi, mohon sertakan: (1) Android version, (2) langkah reproduksi, (3) screenshot/video jika ada.';
+  } else if (text.match(/login|masuk|akun|password|lupa/)) {
+    contextualNote = '\nIssue login/auth sedang kami prioritaskan. Coba reset password via "Forgot password" di launcher jika tidak bisa login.';
+  } else if (text.match(/download|unduh|install|instal|apk/)) {
+    contextualNote = '\nUntuk masalah download/install, pastikan: koneksi stabil, storage cukup (min 3GB), izinkan install dari sumber tidak dikenal.';
+  } else if (text.match(/patch|mod|update|versi/)) {
+    contextualNote = '\nIssue terkait patch/mod akan diteruskan ke tim modding. Pastikan Shizuku aktif dan launcher versi terbaru.';
+  } else if (text.match(/feature|fitur|request|saran|masukan/)) {
+    contextualNote = '\nTerima kasih atas saran fitur! Semua request dikumpulkan untuk rilis mendatang.';
+  } else if (text.match(/bug|error|gagal|tidak bisa|problem/)) {
+    contextualNote = '\nUntuk mempercepat resolusi, mohon sertakan: langkah reproduksi, expected vs actual behavior, screenshot.';
+  } else if (text.match(/lag|slow|lambat|lelet|performance/)) {
+    contextualNote = '\nIssue performance: coba clear cache, close background apps, disable halftone background di Settings.';
+  }
+
   return `Terima kasih ${userName} atas laporan Anda mengenai "${issueTitle}".
 
-Issue Anda telah kami terima dan akan direview dalam 1-2 hari kerja. Kami berkomitmen untuk mengevaluasi setiap laporan secara serius dan akan memberikan update melalui issue ini secepatnya.
+Issue Anda telah kami terima dan akan direview dalam 1-2 hari kerja. Kami berkomitmen untuk mengevaluasi setiap laporan secara serius dan akan memberikan update melalui issue ini secepatnya.${contextualNote}
 
 Jika issue ini bersifat urgent (crash, data loss, security), tim kami akan memprioritaskan penanganan. Untuk pertanyaan atau diskusi lebih lanjut, Anda dapat membalas thread ini.
 
@@ -3933,31 +3952,6 @@ async function submitIssue() {
   }
   if (title.length < 5) {
     errEl.textContent = 'Judul minimal 5 karakter.';
-    errEl.classList.add('show');
-    return;
-  }
-  if (body.length < 10) {
-    errEl.textContent = 'Detail issue minimal 10 karakter. Jelaskan lebih lengkap.';
-    errEl.classList.add('show');
-    return;
-  }
-
-  // Anti-spam: check if user created an issue in the last 3 minutes
-  const lastIssueTime = localStorage.getItem('dlavie_last_issue_time');
-  if (lastIssueTime) {
-    const elapsed = Date.now() - parseInt(lastIssueTime);
-    if (elapsed < 180000) {  // 3 minutes
-      const waitSec = Math.ceil((180000 - elapsed) / 1000);
-      errEl.textContent = `Tunggu ${waitSec} detik lagi sebelum membuat issue baru.`;
-      errEl.classList.add('show');
-      return;
-    }
-  }
-
-  // Anti-spam: reject obvious spam patterns
-  const spamPatterns = /^(test|asdf|aaaa|bbbb|1234|test123|halo|hi|hello|test issue|coba)$/i;
-  if (spamPatterns.test(title.trim())) {
-    errEl.textContent = 'Judul tidak valid. Gunakan judul yang deskriptif.';
     errEl.classList.add('show');
     return;
   }
@@ -4044,7 +4038,6 @@ async function submitIssue() {
       console.warn('Auto-reply insert failed:', e);
     }
 
-    localStorage.setItem('dlavie_last_issue_time', Date.now().toString());
     closeCreateIssueModal();
 
     // Scroll to issues page + refresh list

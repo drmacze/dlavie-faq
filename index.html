@@ -1487,7 +1487,7 @@
     background: var(--surface-1);
     border: 1px solid var(--glass-stroke);
     border-radius: var(--radius-lg);
-    padding: 24px;
+    padding: 16px;
     transition: border-color 0.3s;
   }
 
@@ -1497,14 +1497,14 @@
 
   .issue-card-header {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 12px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
   }
 
   .issue-card-avatar {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: var(--surface-2);
     border: 1px solid var(--glass-stroke);
@@ -1512,43 +1512,45 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 11px;
     flex-shrink: 0;
     overflow: hidden;
   }
 
   .issue-card-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 100%; height: 100%; object-fit: cover;
   }
 
   .issue-card-meta {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .issue-card-author {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-white);
   }
 
   .issue-card-time {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--sub-text);
     font-family: var(--font-mono);
   }
 
   .issue-card-category {
     display: inline-block;
-    padding: 4px 10px;
+    padding: 2px 8px;
     border-radius: var(--radius-pill);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-bottom: 8px;
+    flex-shrink: 0;
   }
 
   .issue-card-category.bug { background: rgba(255,68,68,0.15); color: #FF6B6B; }
@@ -1558,64 +1560,95 @@
 
   .issue-card-title {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-white);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     line-height: 1.3;
   }
 
   .issue-card-body {
     color: var(--soft-text);
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 16px;
-    white-space: pre-wrap;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    cursor: pointer;
+    transition: -webkit-line-clamp 0.3s;
+  }
+
+  .issue-card-body.expanded {
+    -webkit-line-clamp: unset;
+    overflow: visible;
   }
 
   .issue-card-reply {
-    background: rgba(255,255,255,0.03);
+    background: rgba(255,255,255,0.02);
     border: 1px solid var(--hairline);
-    border-left: 3px solid var(--text-white);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    margin-top: 16px;
+    border-left: 2px solid var(--text-white);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-top: 8px;
   }
 
   .issue-card-reply-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 6px;
+    margin-bottom: 4px;
+    cursor: pointer;
   }
 
   .issue-card-reply-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 8px;
+    padding: 2px 7px;
     background: var(--text-white);
     color: var(--pure-black);
     border-radius: var(--radius-pill);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
 
+  .issue-card-reply-toggle {
+    font-size: 11px;
+    color: var(--sub-text);
+    margin-left: auto;
+  }
+
   .issue-card-reply-text {
     color: var(--soft-text);
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 12px;
+    line-height: 1.5;
     white-space: pre-wrap;
+    display: none;
+    margin-top: 6px;
+  }
+
+  .issue-card-reply.expanded .issue-card-reply-text {
+    display: block;
+  }
+
+  .issue-card-reply.expanded .issue-card-reply-toggle::after {
+    content: ' ▲';
+  }
+
+  .issue-card-reply:not(.expanded) .issue-card-reply-toggle::after {
+    content: ' ▼';
   }
 
   .issue-card-id {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 8px;
+    padding-top: 6px;
     border-top: 1px solid var(--hairline);
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 9px;
     color: var(--dim-text);
     letter-spacing: 0.04em;
   }
@@ -3848,12 +3881,12 @@ function generateAutoReply(userName, issueTitle, issueId) {
 
   return `Terima kasih ${userName} atas laporan Anda mengenai "${issueTitle}".
 
-Tim DLavie telah menerima issue Anda dan akan mereview dalam 1-2 hari kerja. Kami berkomitmen untuk mengevaluasi setiap laporan secara serius dan akan memberikan update melalui issue ini secepatnya.
+Issue Anda telah kami terima dan akan direview dalam 1-2 hari kerja. Kami berkomitmen untuk mengevaluasi setiap laporan secara serius dan akan memberikan update melalui issue ini secepatnya.
 
 Jika issue ini bersifat urgent (crash, data loss, security), tim kami akan memprioritaskan penanganan. Untuk pertanyaan atau diskusi lebih lanjut, Anda dapat membalas thread ini.
 
 Salam hangat,
-Tim DLavie
+DLavie support
 
 ───────────────────
 Issue ID: ${issueId}
@@ -3910,6 +3943,29 @@ async function submitIssue() {
     const issueId = data[0].id;
     const shortId = issueId.substring(0, 8);
 
+    // Also insert into support_tickets so it shows up in DevHub ticket inbox
+    // with category "DLavie portal" for team to review
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/support_tickets`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${localStorage.getItem('dlavie_access')}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          category: 'DLavie portal',
+          complaint: `[${selectedCategory}] ${title}\n\n${body}`,
+          status: 'open',
+          android_version: 'Web FAQ'
+        })
+      });
+    } catch (e) {
+      console.warn('support_tickets insert failed (non-critical):', e);
+    }
+
     // Generate and insert auto-reply as a comment
     const autoReply = generateAutoReply(
       currentUser.display_name || currentUser.username,
@@ -3933,7 +3989,6 @@ async function submitIssue() {
         })
       });
     } catch (e) {
-      // Auto-reply insert failed — issue still created
       console.warn('Auto-reply insert failed:', e);
     }
 
@@ -4051,12 +4106,13 @@ async function loadIssues() {
       const comments = commentsMap[issue.id] || [];
       const replyHtml = comments.length > 0
         ? `
-          <div class="issue-card-reply">
+          <div class="issue-card-reply" onclick="this.classList.toggle('expanded')">
             <div class="issue-card-reply-header">
               <span class="issue-card-reply-badge">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
                 Auto-Reply
               </span>
+              <span class="issue-card-reply-toggle">Lihat balasan</span>
             </div>
             <div class="issue-card-reply-text">${escapeHtml(comments[0].body)}</div>
           </div>
@@ -4068,15 +4124,15 @@ async function loadIssues() {
           <div class="issue-card-header">
             <div class="issue-card-avatar">${avatarHtml}</div>
             <div class="issue-card-meta">
-              <div class="issue-card-author">${escapeHtml(authorName)}</div>
-              <div class="issue-card-time">${time}</div>
+              <span class="issue-card-author">${escapeHtml(authorName)}</span>
+              <span class="issue-card-category ${catClass}">${escapeHtml(category)}</span>
+              <span class="issue-card-time">${time}</span>
             </div>
           </div>
-          <div class="issue-card-category ${catClass}">${escapeHtml(category)}</div>
           <h3 class="issue-card-title">${escapeHtml(issue.title)}</h3>
-          <div class="issue-card-body">${escapeHtml(bodyText)}</div>
+          <div class="issue-card-body" onclick="this.classList.toggle('expanded')">${escapeHtml(bodyText)}</div>
           ${replyHtml}
-          <div class="issue-card-id">Issue ID: ${shortId} · ${issue.id}</div>
+          <div class="issue-card-id">Issue ID: ${shortId}</div>
         </article>
       `;
     }).join('');

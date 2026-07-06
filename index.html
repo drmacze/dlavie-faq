@@ -1606,14 +1606,39 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px 7px;
-    background: var(--text-white);
+    padding: 2px 8px;
+    background: linear-gradient(110deg, #888 0%, #FFF 25%, #CCC 50%, #FFF 75%, #888 100%);
+    background-size: 200% 100%;
     color: var(--pure-black);
     border-radius: var(--radius-pill);
     font-size: 9px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    animation: shiny-sweep 3s linear infinite;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .issue-card-reply-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    animation: shiny-flash 3s linear infinite;
+  }
+
+  @keyframes shiny-sweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  @keyframes shiny-flash {
+    0%, 100% { left: -100%; }
+    50%, 60% { left: 200%; }
   }
 
   .issue-card-reply-toggle {
@@ -4110,7 +4135,7 @@ async function loadIssues() {
             <div class="issue-card-reply-header">
               <span class="issue-card-reply-badge">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
-                Auto-Reply
+                DLavie support
               </span>
               <span class="issue-card-reply-toggle">Lihat balasan</span>
             </div>
@@ -4137,17 +4162,48 @@ async function loadIssues() {
       `;
     }).join('');
 
-    // Re-trigger reveal animations
+    // ScrollTrigger: stagger reveal issue cards on scroll
     if (window.ScrollTrigger) {
       ScrollTrigger.refresh();
+      // Set initial state
+      gsap.set('#issuesList .issue-card', { opacity: 0, y: 40 });
+      // Animate on scroll
       gsap.to('#issuesList .issue-card', {
         opacity: 1,
         y: 0,
-        duration: 0.6,
+        duration: 0.7,
         ease: 'power3.out',
-        stagger: 0.08,
-        scrollTrigger: { trigger: '#issuesList', start: 'top 85%' }
+        stagger: 0.06,
+        scrollTrigger: {
+          trigger: '#issuesList',
+          start: 'top 85%',
+          end: 'bottom 20%',
+          toggleActions: 'play none none reverse'
+        }
       });
+
+      // Also animate issues section header
+      gsap.fromTo('#issues .section-label',
+        { opacity: 0, x: -20 },
+        {
+          opacity: 1, x: 0, duration: 0.6, ease: 'power2.out',
+          scrollTrigger: { trigger: '#issues', start: 'top 80%' }
+        }
+      );
+      gsap.fromTo('#issues .section-title',
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.1,
+          scrollTrigger: { trigger: '#issues', start: 'top 80%' }
+        }
+      );
+      gsap.fromTo('#issues .hero-subtitle',
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.2,
+          scrollTrigger: { trigger: '#issues', start: 'top 80%' }
+        }
+      );
     }
   } catch (err) {
     listEl.innerHTML = `

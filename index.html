@@ -21,7 +21,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
 <!-- Lenis smooth scroll -->
-<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
 <style>
   /* ═══════════════════════════════════════════════════════════════
@@ -64,6 +64,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
@@ -81,6 +82,15 @@
     -moz-osx-font-smoothing: grayscale;
     position: relative;
     min-height: 100vh;
+    min-height: 100dvh;
+    touch-action: manipulation;  /* removes 300ms tap delay on mobile */
+  }
+
+  /* Buttons: ensure 44x44 min touch target on mobile (WCAG) */
+  button, a.nav-cta, a.btn-primary, a.btn-secondary, .category-pill, .faq-question, .mobile-menu-cta, .menu-toggle {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
   }
 
   /* ═══════════════════════════════════════════════════════════════
@@ -281,6 +291,7 @@
      ═══════════════════════════════════════════════════════════════ */
   .hero {
     min-height: 100vh;
+    min-height: 100dvh;  /* dynamic viewport height — fixes mobile browser UI jump */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -296,13 +307,14 @@
     align-items: center;
     gap: 8px;
     padding: 6px 14px 6px 6px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--glass-stroke);
+    background: var(--text-white);
+    border: 1px solid var(--text-white);
     border-radius: var(--radius-pill);
     font-size: 12px;
-    color: var(--soft-text);
+    color: var(--pure-black);
     margin-bottom: 32px;
-    backdrop-filter: blur(10px);
+    font-weight: 600;
+    box-shadow: 0 8px 30px rgba(255,255,255,0.18);
   }
 
   .hero-badge-dot {
@@ -327,12 +339,33 @@
     margin-bottom: 24px;
     max-width: 1200px;
     color: var(--text-white);
+    min-height: 1.2em;  /* prevent layout shift while typing */
   }
 
   .hero-title .accent {
     font-style: italic;
     font-weight: 400;
     color: var(--sub-text);
+  }
+
+  /* Typing cursor blink */
+  .typing-cursor {
+    display: inline-block;
+    color: var(--text-white);
+    font-weight: 300;
+    margin-left: 4px;
+    animation: blink-cursor 0.9s steps(2) infinite;
+  }
+
+  @keyframes blink-cursor {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* Hide cursor when typing done */
+  .typing-done .typing-cursor {
+    animation: blink-cursor 1s steps(2) infinite 2;
+    opacity: 0;
   }
 
   /* Body text gets subtle dynamic glow */
@@ -1153,15 +1186,11 @@
 <section class="hero">
   <div class="hero-badge">
     <span class="hero-badge-dot">✓</span>
-    <span>v7.9.17 — Onboarding Modal + Edit Profile Fix</span>
+    <span>DLavie: New FIFA Modding Launcher</span>
   </div>
 
   <h1 class="hero-title" id="heroTitle">
-    <span class="word"><span class="word-inner">Pertanyaan</span></span>
-    <span class="word"><span class="word-inner">yang</span></span>
-    <span class="word"><span class="word-inner">sering</span></span>
-    <br>
-    <span class="word"><span class="word-inner accent">ditanyakan.</span></span>
+    <span id="typingTarget"></span><span class="typing-cursor">|</span>
   </h1>
 
   <p class="hero-subtitle" id="heroSubtitle">
@@ -2032,14 +2061,31 @@ gsap.ticker.lagSmoothing(0);
    HERO ANIMATIONS — text reveal on load
    ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
-  // Hero title: word-by-word slide up
-  gsap.to('.hero-title .word-inner', {
-    y: '0%',
-    duration: 1.1,
-    ease: 'expo.out',
-    stagger: 0.08,
-    delay: 0.2
-  });
+  // ── Typing animation for hero title ──
+  // Text di atas search bar dianimasikan mengetik kata per kata
+  const typingText = 'Pertanyaan yang sering ditanyakan.';
+  const typingTarget = document.getElementById('typingTarget');
+  const heroTitle = document.getElementById('heroTitle');
+  const words = typingText.split(' ');
+  let wordIdx = 0;
+  let typed = '';
+
+  function typeNextWord() {
+    if (wordIdx >= words.length) {
+      // Typing done — keep cursor blinking softly
+      heroTitle.classList.add('typing-done');
+      return;
+    }
+    typed += (wordIdx === 0 ? '' : ' ') + words[wordIdx];
+    typingTarget.textContent = typed;
+    wordIdx++;
+    // Variable delay: slower after punctuation, normal otherwise
+    const delay = words[wordIdx - 1].endsWith('.') ? 600 : 350;
+    setTimeout(typeNextWord, delay);
+  }
+
+  // Start typing after a short delay (let badge fade in first)
+  setTimeout(typeNextWord, 800);
 
   // Hero badge
   gsap.from('.hero-badge', {
@@ -2273,17 +2319,17 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ═══════════════════════════════════════════════════════════════
-   DOWNLOAD LATEST LAUNCHER
-   Uses GitHub's "releases/latest/download/<asset>" shortcut URL.
-   This endpoint:
-     - Doesn't require API calls (no rate limit issues)
-     - Always points to the latest published release
-     - 302-redirects to the actual blob storage
-     - Sets Content-Disposition: attachment → browser downloads directly
-   No GitHub web UI navigation — browser downloads APK in background.
+   DOWNLOAD LATEST LAUNCHER — Cross-browser direct download
+   GitHub's releases/latest/download URL sets Content-Disposition:
+   attachment, so all major browsers will download the file directly.
+   We use a 3-tier fallback strategy for max compatibility:
+     1. <a download> click (works in Chrome/Firefox/Safari/Edge)
+     2. window.open with download attribute (older browsers)
+     3. window.location.href as last resort
    ═══════════════════════════════════════════════════════════════ */
 const LAUNCHER_APK_URL = 'https://github.com/drmacze/F16-Launcher/releases/latest/download/DLavie26-Launcher-debug.apk';
 const LAUNCHER_APK_NAME = 'DLavie26-Launcher-debug.apk';
+const LAUNCHER_FALLBACK_URL = 'https://github.com/drmacze/F16-Launcher/releases/latest';
 
 function downloadLatestLauncher(event) {
   if (event) event.preventDefault();
@@ -2292,22 +2338,31 @@ function downloadLatestLauncher(event) {
   if (btnText) btnText.textContent = 'Memuat…';
   document.body.style.cursor = 'wait';
 
+  // Strategy 1: hidden <a download> — most reliable cross-browser
   try {
-    // Use hidden <a download> click — browser downloads the file
-    // directly without navigating away from the current page.
     const a = document.createElement('a');
     a.href = LAUNCHER_APK_URL;
-    a.download = LAUNCHER_APK_NAME;   // hint filename
+    a.download = LAUNCHER_APK_NAME;
     a.rel = 'noopener';
+    a.target = '_blank';  // helps some browsers treat as download
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
-    // Cleanup after click dispatched
-    setTimeout(() => document.body.removeChild(a), 1000);
+    setTimeout(() => {
+      try { document.body.removeChild(a); } catch (_) {}
+    }, 1500);
   } catch (err) {
-    // Last-resort fallback: navigate to releases page
-    window.open('https://github.com/drmacze/F16-Launcher/releases/latest', '_blank', 'noopener');
-    console.error(err);
+    console.warn('Strategy 1 failed, trying fallback:', err);
+    // Strategy 2: window.open (some mobile browsers handle this better)
+    try {
+      const win = window.open(LAUNCHER_APK_URL, '_blank');
+      if (!win) {
+        // Strategy 3: last resort — location href
+        window.location.href = LAUNCHER_FALLBACK_URL;
+      }
+    } catch (e) {
+      window.location.href = LAUNCHER_FALLBACK_URL;
+    }
   } finally {
     setTimeout(() => {
       if (btnText) btnText.textContent = original;

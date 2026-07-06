@@ -1139,7 +1139,7 @@
   <h2 class="section-title reveal">Pilih topik atau cari pertanyaan.</h2>
 
   <div class="categories" id="categories">
-    <button class="category-pill active" data-cat="all">
+    <button class="category-pill" data-cat="all">
       Semua <span class="category-pill-count" id="count-all">0</span>
     </button>
     <button class="category-pill" data-cat="instalasi">
@@ -1185,11 +1185,15 @@
   <div class="cta-buttons reveal">
     <a href="#" id="ctaDownloadBtn" class="btn-primary" onclick="downloadLatestLauncher(event)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-      <span id="ctaDownloadBtnText">Download Launcher Terbaru</span>
+      <span id="ctaDownloadBtnText">Download Launcher</span>
     </a>
     <a href="https://github.com/drmacze/F16-Launcher/issues/new" target="_blank" rel="noopener" class="btn-secondary">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
       Buka Issue
+    </a>
+    <a href="https://github.com/drmacze/F16-Launcher" target="_blank" rel="noopener" class="btn-secondary">
+      Lihat Repo
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
     </a>
   </div>
 </section>
@@ -1696,12 +1700,24 @@ const faqList = document.getElementById('faqList');
 const faqEmpty = document.getElementById('faqEmpty');
 const searchInput = document.getElementById('searchInput');
 
-let currentCategory = 'all';
+let currentCategory = null;  // null = no category selected, show empty state with hint
 let currentSearch = '';
 
 function renderFAQ() {
+  // If no category selected and no search query → show empty state with hint
+  if (currentCategory === null && currentSearch === '') {
+    faqList.innerHTML = '';
+    faqEmpty.style.display = 'block';
+    // Update empty state message
+    const emptyTitle = faqEmpty.querySelector('.faq-empty-title');
+    const emptyText = faqEmpty.querySelector('p');
+    if (emptyTitle) emptyTitle.textContent = 'Pilih kategori di atas';
+    if (emptyText) emptyText.textContent = 'Atau gunakan kolom pencarian untuk mencari pertanyaan spesifik.';
+    return;
+  }
+
   const filtered = FAQ_DATA.filter(item => {
-    const matchCat = currentCategory === 'all' || item.cat === currentCategory;
+    const matchCat = currentCategory === null || currentCategory === 'all' || item.cat === currentCategory;
     const matchSearch = currentSearch === '' ||
       item.q.toLowerCase().includes(currentSearch) ||
       item.a.toLowerCase().includes(currentSearch) ||
@@ -1712,6 +1728,10 @@ function renderFAQ() {
   if (filtered.length === 0) {
     faqList.innerHTML = '';
     faqEmpty.style.display = 'block';
+    const emptyTitle = faqEmpty.querySelector('.faq-empty-title');
+    const emptyText = faqEmpty.querySelector('p');
+    if (emptyTitle) emptyTitle.textContent = 'Tidak ada hasil';
+    if (emptyText) emptyText.textContent = 'Coba kata kunci lain atau pilih kategori berbeda.';
     return;
   }
 
@@ -1803,9 +1823,16 @@ function updateCounts() {
 // Category pill clicks
 document.querySelectorAll('.category-pill').forEach(pill => {
   pill.addEventListener('click', () => {
-    document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    currentCategory = pill.dataset.cat;
+    const cat = pill.dataset.cat;
+    // Toggle: if user clicks the active pill again, deselect it
+    if (currentCategory === cat) {
+      currentCategory = null;
+      pill.classList.remove('active');
+    } else {
+      document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentCategory = cat;
+    }
     renderFAQ();
   });
 });
@@ -2168,40 +2195,18 @@ document.addEventListener('keydown', (e) => {
 
 /* ═══════════════════════════════════════════════════════════════
    DOWNLOAD LATEST LAUNCHER
-   Fetches latest release from GitHub API → finds APK asset →
-   triggers DIRECT file download via hidden <a download> click.
-   No GitHub web UI navigation at all — browser downloads the APK
-   in the background while user stays on the FAQ page.
+   Uses GitHub's "releases/latest/download/<asset>" shortcut URL.
+   This endpoint:
+     - Doesn't require API calls (no rate limit issues)
+     - Always points to the latest published release
+     - 302-redirects to the actual blob storage
+     - Sets Content-Disposition: attachment → browser downloads directly
+   No GitHub web UI navigation — browser downloads APK in background.
    ═══════════════════════════════════════════════════════════════ */
-let _latestAssetUrl = null;
-let _latestAssetName = 'DLavie26-Launcher-debug.apk';
+const LAUNCHER_APK_URL = 'https://github.com/drmacze/F16-Launcher/releases/latest/download/DLavie26-Launcher-debug.apk';
+const LAUNCHER_APK_NAME = 'DLavie26-Launcher-debug.apk';
 
-async function fetchLatestLauncherUrl() {
-  if (_latestAssetUrl) return { url: _latestAssetUrl, name: _latestAssetName };
-  try {
-    const resp = await fetch('https://api.github.com/repos/drmacze/F16-Launcher/releases/latest', {
-      headers: { 'Accept': 'application/vnd.github+json' }
-    });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-    // Find first .apk asset
-    const apk = (data.assets || []).find(a => a.name.toLowerCase().endsWith('.apk'));
-    if (!apk || !apk.browser_download_url) {
-      throw new Error('No APK asset in latest release');
-    }
-    _latestAssetUrl = apk.browser_download_url;
-    _latestAssetName = apk.name;
-    return { url: _latestAssetUrl, name: _latestAssetName };
-  } catch (err) {
-    console.warn('GitHub API fetch failed, falling back to latest/download pattern:', err);
-    // Fallback: GitHub's "latest/download" shortcut (works if asset name is consistent)
-    const fallbackUrl = 'https://github.com/drmacze/F16-Launcher/releases/latest/download/DLavie26-Launcher-debug.apk';
-    _latestAssetUrl = fallbackUrl;
-    return { url: fallbackUrl, name: 'DLavie26-Launcher-debug.apk' };
-  }
-}
-
-async function downloadLatestLauncher(event) {
+function downloadLatestLauncher(event) {
   if (event) event.preventDefault();
   const btnTexts = document.querySelectorAll('#downloadBtnText, #ctaDownloadBtnText');
   const original = [];
@@ -2212,14 +2217,11 @@ async function downloadLatestLauncher(event) {
   document.body.style.cursor = 'wait';
 
   try {
-    const { url, name } = await fetchLatestLauncherUrl();
-
-    // Use hidden <a download> click — this tells the browser to download
-    // the file directly without navigating away from the current page.
-    // Cross-origin works because GitHub sets Content-Disposition: attachment.
+    // Use hidden <a download> click — browser downloads the file
+    // directly without navigating away from the current page.
     const a = document.createElement('a');
-    a.href = url;
-    a.download = name;          // hint filename
+    a.href = LAUNCHER_APK_URL;
+    a.download = LAUNCHER_APK_NAME;   // hint filename
     a.rel = 'noopener';
     a.style.display = 'none';
     document.body.appendChild(a);
@@ -2227,7 +2229,8 @@ async function downloadLatestLauncher(event) {
     // Cleanup after click dispatched
     setTimeout(() => document.body.removeChild(a), 1000);
   } catch (err) {
-    alert('Gagal mengambil URL download. Coba buka https://github.com/drmacze/F16-Launcher/releases/latest secara manual.');
+    // Last-resort fallback: navigate to releases page
+    window.open('https://github.com/drmacze/F16-Launcher/releases/latest', '_blank', 'noopener');
     console.error(err);
   } finally {
     setTimeout(() => {
@@ -2236,9 +2239,6 @@ async function downloadLatestLauncher(event) {
     }, 3000);
   }
 }
-
-// Pre-fetch the URL on page load so the click feels instant
-fetchLatestLauncherUrl().catch(() => {});
 
 </script>
 

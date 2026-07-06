@@ -938,6 +938,15 @@
     transform: translateY(30px);
   }
 
+  /* Fallback: force visible after 3s if GSAP fails to trigger
+     (fixes invisible buttons on Android when ScrollTrigger fails) */
+  .reveal {
+    animation: reveal-fallback 0.01s 3s forwards;
+  }
+  @keyframes reveal-fallback {
+    to { opacity: 1; transform: none; }
+  }
+
   .reveal-line {
     overflow: hidden;
     display: block;
@@ -1749,9 +1758,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
     Download Launcher
   </a>
-  <a href="https://github.com/drmacze/F16-Launcher/issues/new" target="_blank" rel="noopener" class="mobile-menu-cta">
+  <a href="#" class="mobile-menu-cta" onclick="closeMobileMenu(); openCreateIssueFlow(event); return false;">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
-    Buka Issue
+    Buat Issue
   </a>
   <a href="https://github.com/drmacze/F16-Launcher" target="_blank" rel="noopener" class="mobile-menu-cta">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
@@ -1869,7 +1878,7 @@
   <p class="cta-subtitle reveal">
     Gabung Discord atau buat issue di GitHub. Tim dan komunitas akan bantu.
   </p>
-  <div class="cta-buttons reveal">
+  <div class="cta-buttons">
     <a href="#" class="btn-primary" onclick="openCreateIssueFlow(event)">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
       Buat Issue
@@ -3244,17 +3253,30 @@ function switchAuthMode(mode) {
   }
 }
 
-// ─── Connect to DLavie (graceful deep link detection) ───
-// We use a 3-tier approach that does NOT trigger browser error dialogs:
-//   1. Try to open the app via hidden iframe (silent fail if app not installed)
-//   2. Set a timeout — if user is still on the page after 1.5s, app is not installed
-//   3. Show a clean info modal (not a browser error) with download link
+// ─── Connect to DLavie (reliable cross-platform deep link) ───
+// Strategy:
+//   - Android Chrome: use intent:// scheme (auto-fallback to Play Store or web)
+//   - iOS Safari: use dlavie:// scheme with timeout detection
+//   - Desktop: show info modal
+// The launcher app (com.drmacze.f16launcher) handles the deep link,
+// opens Profile tab, shows "DLavie Portal connected" status, then
+// redirects back to the web with ?token=JWT&uid=...&email=...
 function connectToDLavie() {
   const callbackUrl = encodeURIComponent(window.location.origin + window.location.pathname);
-  const deepLink = `dlavie://connect?callback=${callbackUrl}`;
+  const ua = navigator.userAgent || '';
+  const isAndroid = /android/i.test(ua);
+  const isIOS = /iphone|ipad|ipod/i.test(ua);
+  const isMobile = isAndroid || isIOS;
+
+  if (!isMobile) {
+    // Desktop — no app can open, show info modal
+    showConnectInfoModal();
+    return;
+  }
+
   let appOpened = false;
 
-  // Track visibility change — if app opens, page becomes hidden
+  // Track visibility — if app opens, page becomes hidden
   const visibilityHandler = () => {
     if (document.hidden) {
       appOpened = true;
@@ -3263,36 +3285,28 @@ function connectToDLavie() {
   };
   document.addEventListener('visibilitychange', visibilityHandler);
 
-  // Try to open via window.location.href BUT catch the error
-  // Modern browsers (Safari iOS 16+, Chrome Android) support this pattern
-  // For older browsers, we use the iframe trick below
-  try {
-    // Use a hidden iframe to attempt the deep link — this does NOT trigger
-    // the browser's "cannot open page" error dialog if the app is not installed
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = deepLink;
-    document.body.appendChild(iframe);
+  if (isAndroid) {
+    // Android: use intent:// scheme — Chrome handles this natively
+    // If app is installed → opens app
+    // If app is NOT installed → redirects to S.browser_fallback_url
+    const intentUrl = `intent://connect?callback=${callbackUrl}#Intent;scheme=dlavie;package=com.drmacze.f16launcher;S.browser_fallback_url=https://drmacze.github.io/dlavie-faq/?connect=fail;end`;
+    window.location.href = intentUrl;
+  } else if (isIOS) {
+    // iOS: use dlavie:// scheme — Safari will try to open the app
+    // If app is installed → opens app (page becomes hidden)
+    // If app is NOT installed → Safari shows error (we prevent this with timeout)
+    const deepLink = `dlavie://connect?callback=${callbackUrl}`;
 
-    // Remove iframe after 1.5s
-    setTimeout(() => {
-      try { document.body.removeChild(iframe); } catch (_) {}
-    }, 2000);
-  } catch (e) {
-    // Iframe failed — try window.location as last resort
-    // (this might trigger error dialog on some browsers, but it's the only way)
-    try {
-      window.location.href = deepLink;
-    } catch (_) {
-      // Silently fail — will show info modal below
-    }
+    // Use window.location.href — iOS Safari will attempt to open the app
+    // We set a timeout: if page is still visible after 1.5s, app is not installed
+    window.location.href = deepLink;
   }
 
   // After 1.5s, check if app opened (page became hidden)
   setTimeout(() => {
     document.removeEventListener('visibilitychange', visibilityHandler);
     if (!appOpened && !document.hidden) {
-      // App not installed — show clean info modal (NOT browser error)
+      // App not installed or failed to open — show info modal
       showConnectInfoModal();
     }
     // If appOpened is true, the launcher is now open and will redirect back
